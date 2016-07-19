@@ -17,8 +17,8 @@ categories: coordinates
 ### 天球
 <div id="canvas"></div>
 
+天球
 
-<p>マウスでドラッグしてみてください</p>
 
 <pre>
 </pre>
