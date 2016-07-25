@@ -34,8 +34,18 @@ categories: coordinates
 
 天の赤道を　0°　として、天の北極を　90°　天の南極を -90°
 
-### 赤経()
+$$\delta : 度(°)分(')秒(") \quad で表す$$
+
+
+### 赤経(right ascesion)
 <div id="canvas3"></div>
+
+春分点を0h として　0ｈ から 24h
+
+$$\alpha : 時(h)分(m)秒(s) \quad で表す$$
+
+天球上の天体は（赤経、赤緯）で表せる
+
 
 
 
@@ -43,6 +53,7 @@ categories: coordinates
 <script src="//code.jquery.com/jquery-1.11.3.js"></script>
 <script src="{{site.url}}/js/three.js"></script>
 <script src="https://dl.dropboxusercontent.com/u/3587259/Code/Threejs/OrbitControls.js"></script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></script>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=sons-of-obsidian"></script>
 <script type="text/javascript">
 var $window = $(window)
@@ -398,36 +409,31 @@ var proc3 = function(){
   // 赤経(right ascesion)
   var ascStep = 2 * Math.PI / 24;
   var ascesionGeo = [];
-  for (var i=0; i < 24; i++){
+  for (var i=0; i < 1; i++){
     ascesionGeo[i] = new THREE.Geometry();
     
     var theta = i * ascStep;
     var r = sphereRadius;
     var z = sphereRadius * Math.sin(theta); 
 
-    for (var j=0; j<=pi2; j+=aDegree){
+    for (var j=0; j<pi2; j+=aDegree){
       var x = r*Math.cos(j);
       var z = r*Math.sin(j);
-      var x1 = x*Math.cos(theta) - y*Math.sin(theta);
-      var y1 = x*Math.sin(theta) + y*Math.cos(theta);
-      var z1 = z;  
-
       ascesionGeo[i].vertices.push(
-        new THREE.Vector3( x1, y1, z )
+        new THREE.Vector3( x, 0, z )
       );
     };
   }
 
-  for (var i = 0; i < 24; i++) {
+  for (var i = 0; i < 12; i++) {
     var color = (i==0)?0xffffff:0xff00ff ;
     material = new THREE.MeshLambertMaterial( {
       color: color,
     } );
-    var line = new THREE.Line( ascesionGeo[i], material );
+    var line = new THREE.Line( ascesionGeo[0], material );
+    line.rotation.z = i * pi2 / 24;
     group.add( line );
   };
-
-
 
   // 文字
   var loader = new THREE.FontLoader();
@@ -437,27 +443,27 @@ var proc3 = function(){
       font = response;
       
       material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
-      for (var i = 0; i < 7; i++) {
+      for (var i = 0; i < 24; i++) {
         
-        var text = -90 + i*30;
+        var text = i;
         var textGeo = new THREE.TextGeometry( text, {
           font: font,
           size: 15,
           height: 5
         });    
         var textMesh1 = new THREE.Mesh( textGeo, material );
-        var theta = -Math.PI/2 + i*decStep*3;
-        var r = (sphereRadius+30) * Math.cos(theta);
-        var z = (sphereRadius+20) * Math.sin(theta);
-        var x = r*Math.cos(theta)
-        if (text == "30") {z -=10} ;
-        if (text == "60") {z -=20;x +=50;} ;
-        if (text == "90") {z -=20;} ;
-        if (text == "-60") {z +=15; x+=50;} ;
+        var theta = -pi2 + i*ascStep;
+        var r = (sphereRadius+15) * Math.cos(theta);
+        var y = (sphereRadius+15) * Math.sin(theta);
+        var x = (sphereRadius+15)*Math.cos(theta)
         textMesh1.position.x = x; 
-        textMesh1.position.z = z;
-        textMesh1.rotation.x = Math.PI/2;
-        textMesh1.rotation.y = Math.PI/2;
+        textMesh1.position.y = y;
+        textMesh1.position.z = 0;
+
+        textMesh1.rotation.z = i * pi2 / 24 + pi2/4;
+        textMesh1.rotation.y = Math.PI/2 - Math.sin(i * pi2 / 24);
+        textMesh1.rotation.x = -i * pi2 / 24;
+        //textMesh1.rotation.x += pi2/4;
         group.add(textMesh1);
       };
 
