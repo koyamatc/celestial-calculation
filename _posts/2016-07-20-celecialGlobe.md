@@ -37,17 +37,20 @@ categories: coordinates
 $$\delta : 度(°)分(')秒(") \quad で表す$$
 
 
-### 赤経(right ascesion)
+### 赤経(right ascension)
 <div id="canvas3"></div>
 
-春分点を0h として　0ｈ から 24h
+春分点を0h として　0ｈ から 東の方へ　24h
 
 $$\alpha : 時(h)分(m)秒(s) \quad で表す$$
 
 天球上の天体は（赤経、赤緯）で表せる
 
+1h = 15°　　
 
+1m = 15'  
 
+1s = 15"
 
 
 <script src="//code.jquery.com/jquery-1.11.3.js"></script>
@@ -79,14 +82,6 @@ var proc1 = function(){
   camera.position.z = 1000;
 
   // ライト追加
-/*
-  var dirLight = new THREE.DirectionalLight(0x00ffff, 1);
-  dirLight.position.set(0, 0, 1000);
-  scene.add(dirLight);
-  var dirLight = new THREE.DirectionalLight(0x00ffff, 1);
-  dirLight.position.set(0, 0, -1000);
-  scene.add(dirLight);
-*/
   var ambLight = new THREE.AmbientLight(0xffff00, 1.0);
   scene.add(ambLight);
 
@@ -141,8 +136,6 @@ var proc1 = function(){
   geometry.vertices.push(new THREE.Vector3(0, 0, -200));
   var shape = new THREE.Line( geometry, material );
   group.add( shape );
-
-
 
   // 文字
   var loader = new THREE.FontLoader();
@@ -376,7 +369,7 @@ var proc3 = function(){
   var pi2 = Math.PI * 2;
   var aDegree = Math.PI / 180;
   var decStep = Math.PI / 18;
-  var z = -sphereRadius;
+  var y = -sphereRadius;
 
   
   var declinationGeo = [];
@@ -385,11 +378,11 @@ var proc3 = function(){
     
     var theta = -Math.PI/2 + (i+1)*decStep;
     var r = sphereRadius * Math.cos(theta);
-    z = sphereRadius * Math.sin(theta); 
+    y = sphereRadius * Math.sin(theta); 
 
     for (var j=0; j<=pi2; j+=aDegree){
       var x = r*Math.cos(j);
-      var y = r*Math.sin(j);
+      var z = r*Math.sin(j);
 
       declinationGeo[i].vertices.push(
         new THREE.Vector3( x, y, z )
@@ -414,13 +407,13 @@ var proc3 = function(){
     
     var theta = i * ascStep;
     var r = sphereRadius;
-    var z = sphereRadius * Math.sin(theta); 
+    var y = sphereRadius * Math.sin(theta); 
 
     for (var j=0; j<pi2; j+=aDegree){
       var x = r*Math.cos(j);
-      var z = r*Math.sin(j);
+      var y = r*Math.sin(j);
       ascesionGeo[i].vertices.push(
-        new THREE.Vector3( x, 0, z )
+        new THREE.Vector3( x, y, 0 )
       );
     };
   }
@@ -431,7 +424,7 @@ var proc3 = function(){
       color: color,
     } );
     var line = new THREE.Line( ascesionGeo[0], material );
-    line.rotation.z = i * pi2 / 24;
+    line.rotation.y = i * pi2 / 24;
     group.add( line );
   };
 
@@ -452,26 +445,24 @@ var proc3 = function(){
           height: 5
         });    
         var textMesh1 = new THREE.Mesh( textGeo, material );
-        var theta = -pi2 + i*ascStep;
+        var theta = i*ascStep;
         var r = (sphereRadius+15) * Math.cos(theta);
-        var y = (sphereRadius+15) * Math.sin(theta);
-        var x = (sphereRadius+15)*Math.cos(theta)
-        textMesh1.position.x = x; 
-        textMesh1.position.y = y;
-        textMesh1.position.z = 0;
+        var z = (sphereRadius+15) * Math.sin(theta);
+        var x = (sphereRadius+15) * Math.cos(theta)
 
-        textMesh1.rotation.z = i * pi2 / 24 + pi2/4;
-        textMesh1.rotation.y = Math.PI/2 - Math.sin(i * pi2 / 24);
-        textMesh1.rotation.x = -i * pi2 / 24;
-        //textMesh1.rotation.x += pi2/4;
+        textMesh1.position.x = -x; 
+        textMesh1.position.y = 0;
+        textMesh1.position.z = z;
+ 
+        textMesh1.rotation.y = i * pi2 / 24 - pi2 / 4;
         group.add(textMesh1);
       };
 
     });
 
   
-  //group.rotation.x = Math.PI/9;
-  group.rotation.z = -Math.PI/2;
+  group.rotation.x = Math.PI/2;
+  group.rotation.y = Math.PI/3;
   
   scene.add( group );
   
@@ -488,5 +479,6 @@ var proc3 = function(){
 proc1();
 proc2();
 proc3();
+
 
 </script>
