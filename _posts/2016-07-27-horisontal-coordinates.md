@@ -12,13 +12,18 @@ categories: coordinates
 
 実際に観測者から見える天体の位置を表す座標系
 
-恒星の位置が同じ数値で表せる座標系
-
-
-
 ### 地平座標系
 <div id="canvas1"></div>
 
+東(E)　西(W)　南(S)　北(N)
+
+天頂(Z) 天底(Z')
+
+地平線(horison)：東西南北を通る青線
+
+子午線(meridian)：地平線の南北、天頂、天底を通る白線
+
+X:　位置を表したい天体
 
 <script src="//code.jquery.com/jquery-1.11.3.js"></script>
 <script src="{{site.url}}/js/three.js"></script>
@@ -76,7 +81,7 @@ var proc1 = function(){
     opacity: 0.8
   } );
   var sphere = new THREE.Mesh( geometry, material );
-  group.add( sphere );
+  //group.add( sphere );
 
   // Earth
   geometry = new THREE.SphereGeometry( earthRadius, 32, 32 );
@@ -118,7 +123,7 @@ var proc1 = function(){
     group.add( line );
   };
 
-  // 赤経(right ascesion)
+  // 子午線と東西線
   var ascStep = pi2 / 4;
   var ascesionGeo = [];
   for (var i=0; i < 1; i++){
@@ -147,6 +152,67 @@ var proc1 = function(){
     group.add( line );
   };
 
+  // 天体X
+  var bodyX = new THREE.Geometry();
+    
+  var theta = -aDegree*60;
+  var r = sphereRadius;
+  var y = sphereRadius * Math.sin(theta); 
+
+  for (var j=0; j<pi2; j+=aDegree){
+      var x = r*Math.cos(j);
+      var y = r*Math.sin(j);
+      bodyX.vertices.push(
+        new THREE.Vector3( x, y, 0 )
+      );
+  };
+  material = new THREE.MeshLambertMaterial( {
+      color: 0xffff00
+  } );
+  var line = new THREE.Line( bodyX, material );
+  line.rotation.y = pi2 / 3;
+  group.add( line );
+
+  // 東西南北線
+  var lines = [];
+  material = new THREE.MeshLambertMaterial( {
+      color: 0xffffff
+  } );
+
+  for (var i = 0; i < 2; i++) {
+    
+    var theta = i*pi2/4;
+
+    lines[i] = new THREE.Geometry();
+    for (var j = 0; j < 2; j++) {
+      var z = (sphereRadius) * Math.sin(theta);
+      var x = (sphereRadius) * Math.cos(theta);
+      lines[i].vertices.push(new THREE.Vector3( x, 0, z ));
+      theta += pi2/2; 
+    };
+
+    for (var k = 0; k < 2; k++) {
+      var line = new THREE.Line( lines[k], material );
+      group.add( line );
+    };
+
+  };
+
+  // body X
+  var bodyXline = new THREE.Geometry();
+  var theta = pi2/6;
+  var z = (sphereRadius) * Math.sin(theta);
+  var x = (sphereRadius) * Math.cos(theta);
+  var y = (sphereRadius) * Math.sin(theta);
+  
+  bodyXline.vertices.push(new THREE.Vector3( x, 0, z ));
+  bodyXline.vertices.push(new THREE.Vector3( 0, 0, 0 ));
+  bodyXline.vertices.push(new THREE.Vector3( x, y, z ));
+  
+  var line = new THREE.Line( bodyXline, material );
+  group.add( line );
+
+
   // 文字
   var loader = new THREE.FontLoader();
   var font;
@@ -155,6 +221,7 @@ var proc1 = function(){
       font = response;
       
       material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+      // direction
       for (var i = 0; i < 4; i++) {
         
         var text = (i==0)?"N":(i==1)?"W":(i==2)?"S":"E";
@@ -177,13 +244,54 @@ var proc1 = function(){
         group.add(textMesh1);
       };
 
-      
+      // Zenith
+      for (var i = 0; i < 2; i++) {
+        var text = (i==0)?"Z":"Z'";
+        var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+        });    
+        var textMesh2 = new THREE.Mesh( textGeo, material );
+        var theta = pi2/4 - i*pi2/2;
+        var r = (sphereRadius+15) * Math.cos(theta);
+        var y = (sphereRadius+15) * Math.sin(theta);
+        var x = (sphereRadius+15) * Math.cos(theta)
 
-    });
+        textMesh2.position.x = -x; 
+        textMesh2.position.y = y;
+        textMesh2.position.z = 0;
+ 
+        //textMesh2.rotation.y = (i-1) * pi2 / 4 ;
+        group.add(textMesh2);
+      }
+     
+     // body X
+      for (var i = 0; i < 2; i++) {
+        var text = (i==0)?"H":"X";
+        var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+        }); 
+        var textMesh3 = new THREE.Mesh( textGeo, material );   
+        var theta = pi2/3;
+        var z = (sphereRadius+15) * Math.sin(theta);
+        var x = (sphereRadius+15) * Math.cos(theta);
+        var y = (sphereRadius+15) * Math.sin(i*theta);
 
-  
+        textMesh3.position.x = -x; 
+        textMesh3.position.y = y;
+        textMesh3.position.z = z;
+ 
+        textMesh3.rotation.y =  pi2/3 - pi2/4;
+        group.add(textMesh3);
+     }
+        
+  });
+
   group.rotation.x = 2*Math.PI/3;
-  group.rotation.y = -Math.PI/6;
+  group.rotation.y = -Math.PI/8;
   
   scene.add( group );
   
