@@ -10,6 +10,80 @@ categories: coordinates
 
 <div id="canvas1"></div>
 
+$$O:観測点$$
+$$N:北 \quad E:東 \quad S:南 \quad W:西$$
+$$Z:天頂 \quad Z':天底$$
+$$P:天の北極 \quad P':天の南極$$
+$$\gamma : 春分点$$
+
+$$緑色の円：地平線$$
+$$NZSを通る円：子午線$$
+$$赤い円：天の赤道$$
+
+$$\angle{ZP\gamma}=\Theta \quad 恒星時(sidereal \quad time)\quad 時間とともに変化する$$
+ 
+### 恒星時
+
+天体の高度と方位角を計算するには、
+
+天体の赤経、赤緯だけでなく、観測者の経緯度、時刻が必要
+
++ 視恒星時(apparent sidereal time) 
+  
+  これを使う
+
++ 平均恒星時(mean sidereal time)
+
+#### 恒星時の計算
+
+$$恒星時 \quad \Theta = \Theta_{0} + \lambda + t_{i} + 補正値$$
+$$\Theta_{0}:その日の世界時0時のグリニッジ視恒星時$$
+$$\lambda:観測者の東経$$
+$$t_{i}:世界時0時からの経過時間$$
+
+例題
+
+観測点：東経139ﾟ31'53".6
+
+時刻：1978/06/10 21時20分
+
+東経の値を時間の値に変換する
+
+東経139ﾟ31'53".6　= <span id="AU01"></span>
+
+$$1978/06/10　世界時0時のグリニッジ視恒星時\Theta_{0}：17h 11m 58.714s$$
+$$観測地の東経\lambda = 9h 18m 7.573s$$
+$$世界時0時からの経過時間t_{i}:12h20m(21h20m-9h)$$
+$$補正値:2m1.563s$$
+$$合計=38h52m7.850s"$$
+恒星時は角度
+<div id="sidereal"></div>
+
+### グリニッジ平均恒星時の計算
+
+視恒星時がわからないときに、平均恒星時を使用できる
+
+誤差は　１”　余り
+
+$$平均恒星時 \bar{\Theta} とし、その誤差は１”余りで、$$
+$$この差のことを分点差（equation \quad of \quad equinoxes）E_{q}$$
+$$\Theta = \bar\Theta + E_{q}$$
+
+平均恒星時を求める式は
+$$\Theta_{0} = 6h38m45.836s + 8640184.542sT_{u} + 0.09297sT_{u}^{2}$$
+$$T_{u}は、グリニッジでの1899/12/31正午（1900/1/0正午UT）から数えた経過日数を、
+36525日を１として示した時間の単位$$
+
+例題
+
+1978/06/10　世界時0時グリニッジ平均恒星時を求める
+
+経過日数を計算する
+
+1899/12/31正午から1977/12/31 で
+
+
+
 
 
 <script src="//code.jquery.com/jquery-1.11.3.js"></script>
@@ -120,7 +194,6 @@ var proc1 = function(){
     group.add(pointMesh);
 
   };
-
   // North pole, souith pole
   var poles = [];
   for (var i = 0; i < 2; i++) {
@@ -137,27 +210,47 @@ var proc1 = function(){
 
   };
 
-  // ssssssssssssssssssssssssssssssss
+  // 春分点
+
+  var gamma = new THREE.SphereGeometry( 4, 32, 32 );
+
+  var pointMesh = new THREE.Mesh( gamma, pointMaterial );
+  pointMesh.position.set(114, 116, 116) ; 
+  group.add(pointMesh);
+
+
+  // 
+  material = new THREE.MeshLambertMaterial( {
+    color: 0xffff00
+  } );
+ 
  var horison = new THREE.Geometry();
     
-  var theta = aDegree*15;
+  var theta = 0;
   var r = sphereRadius;
-  for (var j=0; j<=pi2; j+=aDegree){
-      var x = r*Math.cos(theta)*Math.cos(j);
-      var y = r*Math.cos(theta)*Math.sin(j);
-      var z = r*Math.sin(theta)*Math.sin(j);
+  var y = sphereRadius * Math.sin(theta); 
 
+  for (var j=aDegree*52; j<aDegree*150; j+=aDegree){
+      var x = r*Math.cos(j);
+      var y = r*Math.sin(j);
       horison.vertices.push(
-        new THREE.Vector3( x, y, z )
+        new THREE.Vector3( x, y, 0 )
       );
   };
   var horisonLine = new THREE.Line( horison, material );
+  horisonLine.rotation.x = aDegree*30;
+  horisonLine.rotation.y = -aDegree*20;
+
   group.add( horisonLine );
 
 
 
 
   // 地平線
+  material = new THREE.MeshLambertMaterial( {
+    color: 0x00ff00
+  } );
+
   var horison = new THREE.Geometry();
     
   var theta = 0;
@@ -224,32 +317,6 @@ var proc1 = function(){
   //line.rotation.y = i * pi2 / 4;
   group.add( line );
 
-
-  
-  // 天体X
-  var bodyX = new THREE.Geometry();
-    
-  var theta = -aDegree*60;
-  var r = sphereRadius;
-  var y = sphereRadius * Math.sin(theta); 
-
-  for (var j=0; j<pi2; j+=aDegree){
-      var x = r*Math.cos(j);
-      var y = r*Math.sin(j);
-      bodyX.vertices.push(
-        new THREE.Vector3( x, y, 0 )
-      );
-  };
-  material = new THREE.MeshLambertMaterial( {
-      color: 0xffff00
-  } );
-  var line = new THREE.Line( bodyX, material );
-  
-  line.rotation.y = aDegree * 120;
-  //line.rotation.x = -aDegree * 5;
-  
-//  group.add( line );
-
   // 東西南北線
   var lines = [];
   material = new THREE.MeshLambertMaterial( {
@@ -303,21 +370,6 @@ var proc1 = function(){
     group.add( line );
 
   };
-
-
-  // body X
-  var bodyXline = new THREE.Geometry();
-  var theta = pi2/6;
-  var z = (sphereRadius) * Math.sin(theta);
-  var x = (sphereRadius) * Math.cos(theta);
-  var y = (sphereRadius) * Math.sin(theta);
-  
-  bodyXline.vertices.push(new THREE.Vector3( x, 0, z ));
-  bodyXline.vertices.push(new THREE.Vector3( 0, 0, 0 ));
-  bodyXline.vertices.push(new THREE.Vector3( x/2, y, z/2 ));
-  
-  var line = new THREE.Line( bodyXline, material );
-//  group.add( line );
 
 
   // 文字
@@ -408,6 +460,20 @@ var proc1 = function(){
         //textMesh5.rotation.y = (i-1) * pi2 / 4 ;
         group.add(textMesh5);
       }
+    
+     //春分点
+     var text = "r";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      }); 
+      var textMesh5 = new THREE.Mesh( textGeo, material );   
+
+      textMesh5.position.set(120,135,120); 
+ 
+      textMesh5.rotation.y =  aDegree*35;
+      group.add(textMesh5);
         
   });
 
@@ -428,6 +494,48 @@ var proc1 = function(){
 
 proc1();
 
+// 恒星時の計算
 
+var auH = 139,
+    auM = 31,
+    auS = 53.6;
+
+var totalS = auH * 240 + 31 * 4 + auS * 0.0666667;
+var AUH = Math.floor(totalS / 3600);
+var AUM = Math.floor((totalS % 3600) / 60);
+var AUS = (totalS % 3600) % 60;
+
+$("#AU01").html(AUH + "h " + AUM + "m " + AUS + "s");    
+
+//世界時0時視恒星時
+var theta0 = 17*3600 + 11 * 60 + 58.714;
+var lambda = totalS;
+var t = 12 * 3600 + 20 * 60;
+var fix = t * 0.00273791;
+
+var siderealTime = theta0 + lambda + t + fix;
+console.log(siderealTime);
+
+if (siderealTime >= 86400){
+  siderealTime -= 86400;
+}
+var h = Math.floor(siderealTime / 3600);
+var m = Math.floor((siderealTime % 3600) / 60);
+var s = (siderealTime % 3600) % 60;
+
+h *= 15; 
+m *= 15;
+s *= 15;
+
+if (Math.floor(s / 60) > 0 ){
+  m += Math.floor(s / 60);
+  s -= Math.floor(s / 60)*60;  
+}
+if (Math.floor(m / 60) > 0 ){
+  h += Math.floor(m / 60);
+  m -= Math.floor(m / 60)*60;  
+}
+
+$("#sidereal").html(h + "ﾟ " + m + "' " + s + "”");    
 
 </script>
