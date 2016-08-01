@@ -88,6 +88,7 @@ $$T_{u}は、グリニッジでの1899/12/31正午（1900/1/0正午UT）から�
 
 <script src="//code.jquery.com/jquery-1.11.3.js"></script>
 <script src="{{site.url}}/js/three.js"></script>
+<script src="{{site.url}}/js/celestial-calc.js"></script>
 <script src="https://dl.dropboxusercontent.com/u/3587259/Code/Threejs/OrbitControls.js"></script>
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></script>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=sons-of-obsidian"></script>
@@ -215,38 +216,18 @@ var proc1 = function(){
   var gamma = new THREE.SphereGeometry( 4, 32, 32 );
 
   var pointMesh = new THREE.Mesh( gamma, pointMaterial );
-  pointMesh.position.set(114, 116, 116) ; 
+  var h = aDegree * 27;
+  var A = aDegree * -60;
+  var x = sphereRadius * Math.cos(h)*Math.cos(A);
+  var z = sphereRadius * -Math.cos(h)*Math.sin(A);
+  var y = sphereRadius * Math.sin(h);
+
+  pointMesh.position.set(x, y, z);
+  
   group.add(pointMesh);
 
 
-  // 
-  material = new THREE.MeshLambertMaterial( {
-    color: 0xffff00
-  } );
- 
- var horison = new THREE.Geometry();
-    
-  var theta = 0;
-  var r = sphereRadius;
-  var y = sphereRadius * Math.sin(theta); 
-
-  for (var j=aDegree*52; j<aDegree*150; j+=aDegree){
-      var x = r*Math.cos(j);
-      var y = r*Math.sin(j);
-      horison.vertices.push(
-        new THREE.Vector3( x, y, 0 )
-      );
-  };
-  var horisonLine = new THREE.Line( horison, material );
-  horisonLine.rotation.x = aDegree*30;
-  horisonLine.rotation.y = -aDegree*20;
-
-  group.add( horisonLine );
-
-
-
-
-  // 地平線
+  // ********* 地平線 ***********
   material = new THREE.MeshLambertMaterial( {
     color: 0x00ff00
   } );
@@ -268,7 +249,7 @@ var proc1 = function(){
   var horisonLine = new THREE.Line( horison, material );
   group.add( horisonLine );
 
-  // 天の赤道
+  // ******* 天の赤道 ********
   var equator = new THREE.Geometry();
     
   var theta = 0;
@@ -294,7 +275,7 @@ var proc1 = function(){
     group.add( equatorLine );
   };
 
-  // 子午線
+  // ******** 子午線 *******
   meridian = new THREE.Geometry();
     
   var theta = 0;
@@ -315,6 +296,31 @@ var proc1 = function(){
   } );
   var line = new THREE.Line( meridian, material );
   //line.rotation.y = i * pi2 / 4;
+  group.add( line );
+
+  // ******** 春分点線 *******
+  var equinox = new THREE.Geometry();
+    
+  var theta = 0;
+  var r = sphereRadius;
+  var y = sphereRadius * Math.sin(theta); 
+
+  for (var j=aDegree*60; j<aDegree*155; j+=aDegree){
+      var x = r*Math.cos(j);
+      var y = r*Math.sin(j);
+      equinox.vertices.push(
+        new THREE.Vector3( x, y, 0 )
+      );
+  };
+
+  var color = 0xffffff;
+  material = new THREE.MeshLambertMaterial( {
+      color: color
+  } );
+  var line = new THREE.Line( equinox, material );
+  line.rotation.x = aDegree * 45;
+  //line.rotation.z = aDegree * 120;
+  line.rotation.y = -aDegree * 27;
   group.add( line );
 
   // 東西南北線
@@ -469,10 +475,15 @@ var proc1 = function(){
           height: 5
       }); 
       var textMesh5 = new THREE.Mesh( textGeo, material );   
+      var h = aDegree * 27;
+      var A = aDegree * -60;
+      var x = (sphereRadius+10) * Math.cos(h)*Math.cos(A);
+      var z = (sphereRadius+10) * -Math.cos(h)*Math.sin(A);
+      var y = (sphereRadius+10) * Math.sin(h);
 
-      textMesh5.position.set(120,135,120); 
+      textMesh5.position.set(x,y,z); 
  
-      textMesh5.rotation.y =  aDegree*35;
+      //textMesh5.rotation.y =  aDegree*35;
       group.add(textMesh5);
         
   });
@@ -536,6 +547,11 @@ if (Math.floor(m / 60) > 0 ){
   m -= Math.floor(m / 60)*60;  
 }
 
-$("#sidereal").html(h + "ﾟ " + m + "' " + s + "”");    
+$("#sidereal").html(h + "ﾟ " + m + "' " + s + "”");   
+
+// 観測日
+var date0 = new Date(1978,6,10,21,20,0,0)
+getSiderealTime(date0,139,31,53.6,17,11,58.714);
+
 
 </script>
