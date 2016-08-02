@@ -525,7 +525,6 @@ var t = 12 * 3600 + 20 * 60;
 var fix = t * 0.00273791;
 
 var siderealTime = theta0 + lambda + t + fix;
-console.log(siderealTime);
 
 if (siderealTime >= 86400){
   siderealTime -= 86400;
@@ -550,8 +549,14 @@ if (Math.floor(m / 60) > 0 ){
 $("#sidereal").html(h + "ﾟ " + m + "' " + s + "”");   
 
 // 観測日
-var date0 = new Date(1978,6,10,21,20,0,0)
-getSiderealTime(date0,139,31,53.6,17,11,58.714);
+var date0 = new Date(1978,6,20,22,32,17,0);
+var theta0 = new Date(0,0,0,17,51,24,267);
+var sidereal = getSiderealTime(date0,139,32,29.0325,theta0);
+console.log(sidereal);
+
+var date0 = new Date(1978,6,10,0,0,0,0);
+var sidereal = getMeanSiderealTime(date0);
+console.log(sidereal);
 
 
 </script>
