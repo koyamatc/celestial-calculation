@@ -39,7 +39,8 @@ function timeToDegrees(hours, minutes, seconds){
   		m -= Math.floor(m / 60)*60;  
 		}
 
-		return {degrees:degrees, deg:h, min: m, sec: s};
+		var radians = degrees * RadiansPerDegree; 
+		return {degrees:degrees, deg:h, min: m, sec: s, radians: radians};
 };
 
 // ** Convert Time to Radians **
@@ -68,10 +69,17 @@ function timeToRadians(hours, minutes, seconds){
 //	  degrees	
 function degreesToDegrees(degrees, minutes, seconds){
 	var degs = degrees;
-	degs += minutes / SecondsPerMinute;
-	degs += seconds / SecondsPerHour;
+	if (degs < 0) {
+		degs -= minutes / SecondsPerMinute;
+		degs -= seconds / SecondsPerHour;
+	} else {
+		degs += minutes / SecondsPerMinute;
+		degs += seconds / SecondsPerHour;
+	}
 
-	return {degrees:degs};
+	var radians = degs * RadiansPerDegree;
+	
+	return {degrees:degs, radians: radians};
 }
 
 // ** Convert Degrees to Radians **
@@ -106,7 +114,7 @@ function degreesToTime( auDegrees, auMminutes, auSeconds ){
 	totalS = totalS - (minutes * SecondsPerMinute);
 	var seconds = Math.floor(totalS);
 	var	milliseconds = (totalS - seconds) * 1000 ; 
-	console.log(milliseconds);
+	//console.log(milliseconds);
 
 	return {hours:hours, 
 					minutes: minutes, 
@@ -165,6 +173,7 @@ function getSiderealTime(
 		// 恒星時
 		var theta = theta0 + lambda + t + correction;
 
+		console.log("sidereal time");
 		var _theta = displayTime(theta);
 
 		var h = _theta.hours,
@@ -183,8 +192,9 @@ function getSiderealTime(
   		h += Math.floor(m / 60);
   		m -= Math.floor(m / 60)*60;  
 		}
-
-		return {degrees:h, minutes:m, seconds:s};
+		var degs = degreesToDegrees(h, m, s);
+		var radians = degs.degrees * RadiansPerDegree;
+		return {total:degs.degrees,degrees:h, minutes:m, seconds:s, radians:radians};
 }
 
 //*** グリニッジ平均恒星時　****
@@ -194,7 +204,7 @@ function getMeanSiderealTime(datetime){
 
 	// 経過日数を計算
 	var interval = datetime.getTime() - baseDate.getTime();
-	var days = Math.floor(interval / msecPerDay ) + 1.5;
+	var days = Math.floor(interval / msecPerDay ) + 0.5;
 	console.log("days= " + days);
 	var Tu = days / 36525;
 	var Tu2 = Tu*Tu;
@@ -202,15 +212,16 @@ function getMeanSiderealTime(datetime){
 	var baseTime = new Date(0,0,0,15,38,45,836);
 	// ミリ秒
 	var a =  baseTime.getTime();
-	displayTime(a);
+	//displayTime(a);
 	var b = Tu * 8640184.542 *1000;
-	console.log("b= " + b);
-	displayTime(a);
+	//console.log("b= " + b);
+	displayTime(b);
 	var c = Tu2 * 0.0929 *1000;
-	console.log("c= " + c);
-	displayTime(a);
+	//console.log("c= " + c);
+	displayTime(c);
 	var theta0 = a + b + c;
 
+	//console.log("meanSidereal");
 	var workTime = displayTime(theta0);
 	var workDegree = timeToDegrees(
 												workTime.hours,
@@ -243,5 +254,106 @@ function displayTime(time){
 			seconds: seconds,
 			milliseconds: interval
 		}
-}
+};
 
+/* 赤道座標を地平座標に変換する
+	parameters
+		date 		       				 				観測日時
+		lambda_D, lambda_M, lambda_S  観測地点 経度（度、分、秒）
+		phi_D, phi_M, phi_S     			観測地点 緯度（度、分、秒）
+		alpha_H,alpha_M,alpha_S 			天体の赤経（時、分、秒）
+		delta_D,delta_M,delta_S 			天体の赤緯（度、分、秒）
+
+	Output
+		azimuth		: 方位角
+		altitude	:　高度
+
+*/
+function getHorisontalPosition(
+	date,
+	lambda_D, lambda_M, lambda_S,
+	phi_D, phi_M, phi_S,
+	alpha_H, alpha_M, alpha_S,
+	delta_D, delta_M, delta_S
+	){
+  // 平均恒星時の計算
+  var meanSidereal = getMeanSiderealTime(date);
+  var h = meanSidereal.time.hours;
+  var m = meanSidereal.time.minutes;
+  var s = meanSidereal.time.seconds;
+  var l = meanSidereal.time.milliseconds;
+
+  // 恒星時を求める
+  var theta0 = new Date(0,0,0,h,m,s,l);
+  var sidereal = getSiderealTime(date,lambda_D,lambda_M,lambda_S,theta0);
+  var theta_rad = sidereal.radians;
+
+  // 赤経　
+  var alpha = timeToDegrees(alpha_H, alpha_M, alpha_S);
+  var alpha_rad = alpha.radians; 
+
+  // 赤緯
+  var delta = degreesToDegrees(delta_D, delta_M, delta_S);
+  var delta_rad = delta.radians;
+
+  // 緯度
+  var phi = degreesToDegrees(phi_D, phi_M, phi_S);
+  var phi_rad = phi.radians; 
+
+  //theta - alpha --(1)
+  theta_a = theta_rad - alpha_rad;
+
+  //cos(theta - alpha) --(2)
+  var cos_theta_a = Math.cos(theta_a);
+
+  //sin(theta - alpha) --(3)
+  var sin_theta_a = Math.sin(theta_a);
+
+  // cos(phi) --(4)
+  var cos_phi = Math.cos(phi_rad);
+
+  // sin(phi) --(5)
+  var sin_phi = Math.sin(phi_rad);
+
+  // cos(delta) --(6)
+  var cos_delta = Math.cos(delta_rad);
+
+  // sin(delta) --(7)
+  var sin_delta = Math.sin(delta_rad);
+
+  // sin(phi)sin(delta) --(8)
+  var sin_phi_delta = sin_phi * sin_delta;
+
+  // cos(phi)cos(delta)cos(theta_a) --(9)
+  var cos_phi_delta_theta_a = cos_phi * cos_delta * cos_theta_a;
+
+  // sin(h) --(10)
+  var sin_h = sin_phi_delta + cos_phi_delta_theta_a;
+
+  // hight --(11)
+  var _h = 180 / Math.PI * Math.asin(sin_h);
+
+  // -cos(phi)sin(delta) --(12)
+  var _cos_phi_sin_delta = -cos_phi * sin_delta
+
+  // sin(phi)cos(delta)cos(theta_a) --(13)
+  var sin_phi_cos_delta_theta_a = sin_phi * cos_delta * cos_theta_a;
+
+  // cos(h)cos(A) --(14)
+  var cos_h_A = _cos_phi_sin_delta + sin_phi_cos_delta_theta_a;
+
+  // cos(h)sin(A) --(15)=(6)x(3)
+  var cos_h_sin_A =  cos_delta * sin_theta_a;
+  
+  // tan(A) --(16)=(15)/(14)
+  var tan_A =  cos_h_sin_A / cos_h_A;
+
+  // A' --(17)
+  var A1 = Math.fround(180 / Math.PI * Math.atan(tan_A));
+
+  // A --(18)
+  var A = (cos_h_A<0)?A1+180:A1-0.00000000001;
+
+  return {azimuth: A, altitude: _h};
+
+}; 
