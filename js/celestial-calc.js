@@ -357,3 +357,17 @@ function getHorisontalPosition(
   return {azimuth: A, altitude: _h};
 
 }; 
+
+/*
+	方向余弦を取得
+*/
+function getDirCosines(alpha,delta){
+	var alpha_rad = alpha * RadiansPerDegree;
+	var delta_rad = delta * RadiansPerDegree;
+
+	var L = Math.cos(delta_rad)*Math.cos(alpha_rad);
+	var M = Math.cos(delta_rad)*Math.sin(alpha_rad);
+	var N = Math.sin(delta_rad);
+
+	return {L:L, M:M, N:N};
+};
