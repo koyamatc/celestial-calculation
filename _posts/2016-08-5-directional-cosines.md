@@ -181,11 +181,11 @@ $$\sin \delta=N \quad -90°　\ge \delta \ge +90°　$$
 
 + X軸を地平線上の南の向きに
 
-+　Y軸を地平線上の東の向きに
++ Y軸を地平線上の東の向きに
 
-+　Z軸を天頂の向きに
++ Z軸を天頂の向きに
 
-これが地平直行座標系
+れが地平直行座標系
 
 方位角A, 高度h で示される方向余弦（l,m,n）は
 
@@ -197,7 +197,7 @@ $$n = \sin h$$
 $$\tan\A = \frac{m}{l}$$
 $$ \quad l \ge 0で、Aは第Ⅰ象限、または第Ⅳ象限$$
 $$ \quad l \lt 0で、Aは第Ⅱ象限、または第Ⅲ象限$$
-$$\sin h=n \quad -90°　\ge \h \ge +90°　$$
+$$\sin h=n \quad -90°　\ge h \ge +90°　$$
 
 -----
 
@@ -242,14 +242,56 @@ function Point(x,y,z){
   var sphereRadius = 200,
       earthRadius = 4;
 
-  // カメラを追加
+  // point material
+  var pointMaterial = new THREE.MeshLambertMaterial( {
+    color: 0xffffff
+  } );
+
+  // oxyz座標
+  var xyz = [];
+  xyz.push(new Point(0,0,0));
+  xyz.push(new Point(sphereRadius,0,0));
+  xyz.push(new Point(0,sphereRadius,0));
+  xyz.push(new Point(0,0,sphereRadius));
+
+  // 東西南北
+  var news = [];
+  news.push(new Point(sphereRadius,0,0));
+  news.push(new Point(0,sphereRadius,0));
+  news.push(new Point(-sphereRadius,0,0));
+  news.push(new Point(0,-sphereRadius,0));
+
+// 
+var proc1 = function(){
+
+  // シーン追加
+  var scene = new THREE.Scene();
+    // カメラを追加
   var camera = new THREE.OrthographicCamera(  width / - 2, width / 2, height / 2, height / - 2, 1, 10000 );
   camera.position.y = -1000;
 
   // ライト追加
   var ambLight = new THREE.AmbientLight(0xffff00, 1.0);
+  scene.add(ambLight);
 
 
+
+  // point material
+  var pointMaterial = new THREE.MeshLambertMaterial( {
+    color: 0xffffff
+  } );
+
+  
+  // renderer 追加
+  var renderer = new THREE.WebGLRenderer();
+  renderer.setSize( width, height );
+  document.getElementById("canvas1").appendChild( renderer.domElement );
+  // control追加
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  
+  // オブジェクト追加
+  var group = new THREE.Group();
+  
   // Celestial Sphere
   var sphereGeo = new THREE.SphereGeometry( sphereRadius, 32, 32 );
   var sphereMat = new THREE.MeshLambertMaterial( {
@@ -257,58 +299,13 @@ function Point(x,y,z){
     transparent: true,
     opacity: 0.3
   } );
-
-  // Earth(Origin)
-  earthGeo = new THREE.SphereGeometry( earthRadius, 32, 32 );
-  earthMat = new THREE.MeshLambertMaterial( {
-    color: 0x00ff00,
-    transparent: false,
-    opacity: 0.8
-  } );
-
-  // point material
-  var pointMaterial = new THREE.MeshLambertMaterial( {
-    color: 0xffffff
-  } );
-
-  // xyz座標
-  var xyz = [];
-  xyz.push(new Point(sphereRadius,0,0));
-  xyz.push(new Point(0,sphereRadius,0));
-  xyz.push(new Point(0,0,sphereRadius));
-
-// 
-var proc1 = function(){
-
-
-  // シーン追加
-  var scene = new THREE.Scene();
-  // ライド追加
-  scene.add(ambLight);
-
-  // renderer 追加
-  var renderer = new THREE.WebGLRenderer();
-  renderer.setSize( width, height );
-  document.getElementById("canvas1").appendChild( renderer.domElement );
-
-  // control追加
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
-  
-  // オブジェクト追加
-  var group = new THREE.Group();
-  
   // celestial sphere
   var sphere = new THREE.Mesh( sphereGeo, sphereMat );
   group.add( sphere );
 
-  // Earth(Origin)
-  var earth = new THREE.Mesh( earthGeo, earthMat );
-  group.add( earth );
-
-
-  
+  // 座標xyz  
   var points = [];
-  for (var i = 0; i < 3; i++) {
+  for (var i = 0; i < xyz.length; i++) {
 
     points[i] = new THREE.SphereGeometry( 4, 32, 32 );
     var x = xyz[i].x;
@@ -320,7 +317,6 @@ var proc1 = function(){
     group.add(pointMesh);
 
   };
-
 
   // 天体点
   var gamma = new THREE.SphereGeometry( 4, 32, 32 );
@@ -346,7 +342,6 @@ var proc1 = function(){
   pointMesh.position.set(x2, y2, z2);
   
   group.add(pointMesh);
-
 
   // ********* 天の赤道 ***********
   material = new THREE.MeshLambertMaterial( {
@@ -382,7 +377,6 @@ var proc1 = function(){
   var y = 0;
   var z = 0;
 
-
   for (var delta=0; delta<=pi2/4; delta+=aDegree){
       // z軸の周りを反時計回りで回す
       var x1 = x*Math.cos(delta) + y*Math.sin(delta);
@@ -401,38 +395,13 @@ var proc1 = function(){
   var bodyLine = new THREE.Line( body, material );
   group.add( bodyLine );
 
-  // ******** 春分点線 *******
-  var equinox = new THREE.Geometry();
-    
-  var theta = 0;
-
-  var r = sphereRadius;
-  var alpha = aDegree * 0;
-
-  for (var delta=aDegree*0; delta<aDegree*360; delta+=aDegree){
-      var y = sphereRadius * Math.cos(delta) * Math.cos(alpha);
-      var z = sphereRadius * Math.cos(delta) * Math.sin(alpha);;
-      var x = sphereRadius * Math.sin(delta);
-      equinox.vertices.push(
-        new THREE.Vector3( x, y, z )
-      );
-  };
-
-  var color = 0xffffff;
-  material = new THREE.MeshLambertMaterial( {
-      color: color
-  } );
-  var line = new THREE.Line( equinox, material );
-  line.rotation.y = -aDegree * 45;
-  group.add( line );
-
   // XYZ線
   var lines = [];
   material = new THREE.MeshLambertMaterial( {
       color: 0xffffff
   } );
 
-  for (var i = 0; i < 3; i++) {
+  for (var i = 0; i < xyz.length; i++) {
     
     lines[i] = new THREE.Geometry();
     var x = 1.3*xyz[i].x;
@@ -455,7 +424,6 @@ var proc1 = function(){
     var line = new THREE.Line( gLine, material );
   group.add( line );
 
-
   // 文字
   var loader = new THREE.FontLoader();
   var font;
@@ -465,9 +433,9 @@ var proc1 = function(){
       
       material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
       // direction
-      for (var i = 0; i < 3; i++) {
+      for (var i = 0; i < xyz.length; i++) {
         
-        var text = (i==0)?"Y":(i==1)?"Z":"X";
+        var text = (i==0)?"O":(i==1)?"Y":(i==2)?"Z":"X";
         var textGeo = new THREE.TextGeometry( text, {
           font: font,
           size: 15,
@@ -532,8 +500,6 @@ var proc1 = function(){
   group.rotation.x = aDegree*110;
   group.rotation.y = -aDegree*45;
   
-/*
-*/  
   scene.add( group );
   
   function render() {
@@ -547,7 +513,1357 @@ var proc1 = function(){
   render();
 } 
 
+var proc2 = function(){
+  // シーン追加
+  var scene = new THREE.Scene();
+  // カメラを追加
+  var camera = new THREE.OrthographicCamera(  width / - 2, width / 2, height / 2, height / - 2, 1, 10000 );
+  camera.position.y = -1000;
+
+  // ライト追加
+  var ambLight = new THREE.AmbientLight(0xffff00, 1.0);
+  scene.add(ambLight);
+
+   // renderer 追加
+  var renderer = new THREE.WebGLRenderer();
+  renderer.setSize( width, height );
+  document.getElementById("canvas2").appendChild( renderer.domElement );
+  // control追加
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  
+  // グループ追加
+  var group = new THREE.Group();
+ 
+   // ** Celestial Sphere ******
+  var sphereGeo = new THREE.SphereGeometry( sphereRadius, 32, 32 );
+  var sphereMat = new THREE.MeshLambertMaterial( {
+    color: 0xffff00,
+    transparent: true,
+    opacity: 0.3
+  } );
+  // celestial sphere
+  var sphere = new THREE.Mesh( sphereGeo, sphereMat );
+  group.add( sphere );
+
+  /* *** Lines  ***** */
+
+  // ********* 天の赤道 ***********
+  material = new THREE.MeshLambertMaterial( {
+    color: 0xff0000
+  } );
+
+  var horison = new THREE.Geometry();
+    
+  var theta = 0;
+  var r = sphereRadius * Math.cos(theta);
+  var z = sphereRadius * Math.sin(theta); 
+
+  for (var j=0; j<=pi2; j+=aDegree){
+      var x = r*Math.cos(j);
+      var y = r*Math.sin(j);
+
+      horison.vertices.push(
+        new THREE.Vector3( x, y, z )
+      );
+  };
+  var horisonLine = new THREE.Line( horison, material );
+  group.add( horisonLine );
+ 
+  // ********* 赤経角度線 ***********
+  material = new THREE.MeshLambertMaterial( {
+    color: 0x00ff00
+  } );
+
+  var horison = new THREE.Geometry();
+    
+  var theta = 0;
+  var r = ( sphereRadius + 50) * Math.cos(theta);
+  var z = ( sphereRadius + 50) * Math.sin(theta); 
+
+  for (var j=0; j<=aDegree*60; j+=aDegree){
+      var x = r*Math.cos(j);
+      var y = r*Math.sin(j);
+
+      horison.vertices.push(
+        new THREE.Vector3( x, y, z )
+      );
+  };
+  var horisonLine = new THREE.Line( horison, material );
+  group.add( horisonLine );
+ 
+  // XYZ線 **************
+  var lines = [];
+  material = new THREE.MeshLambertMaterial( {
+      color: 0xffffff
+  } );
+
+  for (var i = 1; i < xyz.length; i++) {
+    
+    lines[i] = new THREE.Geometry();
+    var x = 1.3*xyz[i].x;
+    var y = 1.3*xyz[i].y;
+    var z = 1.3*xyz[i].z;
+    lines[i].vertices.push(new THREE.Vector3( 0, 0, 0 ));
+    lines[i].vertices.push(new THREE.Vector3( x, y, z ));
+    var line = new THREE.Line( lines[i], material );
+    group.add( line );
+
+  };
+  
+  // ********* 天体線 ***********
+  material = new THREE.MeshLambertMaterial( {
+    color: 0xffffff
+  } );
+
+  var body = new THREE.Geometry();
+    
+  var alpha = aDegree * 30;
+  var x = 0;
+  var y = sphereRadius;
+  var z = 0;
+
+  for (var delta=0; delta<=pi2/4; delta+=aDegree){
+      // x軸の周りを反時計回りで回す
+      var x1 = 0;
+      var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+      var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+      // z軸の周りを反時計回りで回す
+      var x3 = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+      var y3 = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+      var z3 = z1;  
+
+      body.vertices.push(
+        new THREE.Vector3( x3, y3, z3 )
+      );
+  };
+  
+  var bodyLine = new THREE.Line( body, material );
+  group.add( bodyLine );
+
+  // 赤緯デルタ角度線
+  deltaMat = new THREE.MeshLambertMaterial( {
+    color: 0x00ff00
+  } );
+  var deltaLine = new THREE.Geometry();
+    
+  var alpha = aDegree * 30;
+  var x = 0;
+  var y = sphereRadius + 50;
+  var z = 0;
+
+  for (var delta=0; delta<=aDegree*45; delta+=aDegree){
+      // x軸の周りを反時計回りで回す
+      var x1 = 0;
+      var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+      var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+      // z軸の周りを反時計回りで回す
+      var x3 = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+      var y3 = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+      var z3 = z1;  
+
+      deltaLine.vertices.push(
+        new THREE.Vector3( x3, y3, z3 )
+      );
+  };
+  var deltaLine = new THREE.Line( deltaLine, deltaMat );
+  group.add( deltaLine );
+
+
+  /* **** Points **** */
+
+  // 座標xyz  
+  var points = [];
+  for (var i = 0; i < xyz.length; i++) {
+
+    points[i] = new THREE.SphereGeometry( 4, 32, 32 );
+    var x = xyz[i].x;
+    var y = xyz[i].y;
+    var z = xyz[i].z;
+ 
+    var pointMesh = new THREE.Mesh( points[i], pointMaterial );
+    pointMesh.position.set(x, y, z) ; 
+    group.add(pointMesh);
+
+  };
+
+    // 天体点
+  var gamma = new THREE.SphereGeometry( 4, 32, 32 );
+  var pointMesh = new THREE.Mesh( gamma, pointMaterial );
+
+  var alpha = aDegree * 30;
+  var delta = aDegree * 45;
+
+  var x = 0;
+  var y = sphereRadius;
+  var z = 0;
+
+  // x軸の周りを反時計回りで回す
+  var x1 = 0;
+  var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+  var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+  // z軸の周りを反時計回りで回す
+  var x2 = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+  var y2 = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+  var z2 = z1;  
+
+  pointMesh.position.set(x2, y2, z2);
+  
+  group.add(pointMesh);
+
+  // 天体と天頂を通る大円と赤道の交点
+  var point = new THREE.SphereGeometry( 4, 32, 32 );
+  var pointMesh = new THREE.Mesh( point, pointMaterial );
+
+  var alpha = aDegree * 30;
+
+  var x = 0;
+  var y = sphereRadius;
+  var z = 0;
+
+  // z軸の周りを反時計回りで回す
+  var x3 = x*Math.cos(alpha) + y*Math.sin(alpha);
+  var y3 = x*Math.sin(alpha) + y*Math.cos(alpha);
+  var z3 = z;  
+
+  pointMesh.position.set(x3, y3, z3);
+  
+  group.add(pointMesh);
+
+  // 原点-交点
+  var gLine = new THREE.Geometry();
+    var x = 1.5*x3;
+    var y = 1.5*y3;
+    var z = 1.5*z3;
+    gLine.vertices.push(new THREE.Vector3( 0, 0, 0 ));
+    gLine.vertices.push(new THREE.Vector3( x, y, z ));
+    var line = new THREE.Line( gLine, material );
+  group.add( line );
+
+  // g線
+  var gLine = new THREE.Geometry();
+    var x = 1.5*x2;
+    var y = 1.5*y2;
+    var z = 1.5*z2;
+    gLine.vertices.push(new THREE.Vector3( 0, 0, 0 ));
+    gLine.vertices.push(new THREE.Vector3( x, y, z ));
+    var line = new THREE.Line( gLine, material );
+  group.add( line );
+
+  // **** 文字 *****
+  var loader = new THREE.FontLoader();
+  var font;
+  loader.load( '{{site.url}}/fonts/helvetiker_regular.typeface.json',   
+    function ( response ) {
+      font = response;
+      
+      material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+      // direction
+      for (var i = 0; i < xyz.length; i++) {
+        
+        var text = (i==0)?"O":(i==1)?"X":(i==2)?"Y":"Z";
+        var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+        });    
+        var textMesh1 = new THREE.Mesh( textGeo, material );
+
+        textMesh1.position.x = 1.3*xyz[i].x; 
+        textMesh1.position.y = 1.3*xyz[i].y;
+        textMesh1.position.z = 1.3*xyz[i].z;
+
+        textMesh1.rotation.x = pi2 / 4 ;
+        if ( i== 0) {
+          textMesh1.rotation.y = -aDegree*60;
+        } else {
+          textMesh1.rotation.y = -aDegree*(60+30*(3*i-2));
+        }
+        
+        group.add(textMesh1);
+      };
+      // 春分点、y軸
+      for (var i = 1; i < 3; i++) {
+        
+        var text = (i==1)?"equinox":"6h";
+        var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+        });    
+        var textMesh1 = new THREE.Mesh( textGeo, material );
+
+        textMesh1.position.x = 1.1*xyz[i].x; 
+        textMesh1.position.y = 1.1*xyz[i].y;
+        textMesh1.position.z = 1.1*xyz[i].z+20;
+
+        textMesh1.rotation.x = pi2 / 4 ;
+        if ( i== 0) {
+          textMesh1.rotation.y = -aDegree*60;
+        } else {
+          textMesh1.rotation.y = aDegree*(60+30*(3*i-2));
+        }
+        
+        group.add(textMesh1);
+      };
+
+     // 天の北極
+     var text = "P";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      });    
+      var textMesh1 = new THREE.Mesh( textGeo, material );
+
+      textMesh1.position.x = 1.1*xyz[3].x; 
+      textMesh1.position.y = 1.1*xyz[3].y;
+      textMesh1.position.z = 1.1*xyz[3].z;
+
+      textMesh1.rotation.x = pi2 / 4 ;
+      textMesh1.rotation.y = -aDegree*(60+30*(3*3-2));
+        
+      group.add(textMesh1);
+ 
+     //天体
+     var text = "R(L,M,N)";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      }); 
+      var textMesh5 = new THREE.Mesh( textGeo, material );   
+
+      textMesh5.position.set(x2+15,y2+15,z2); 
+ 
+      textMesh5.rotation.x =  aDegree*90;
+      textMesh5.rotation.y =  aDegree*120;
+      group.add(textMesh5);
+
+     //g線
+     var text = "g";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      }); 
+      var textMesh5 = new THREE.Mesh( textGeo, material );   
+
+      textMesh5.position.set(1.5*x2+15,1.5*y2+15,1.5*z2); 
+
+      textMesh5.rotation.x =  aDegree*90;
+      textMesh5.rotation.y =  aDegree*120;
+ 
+      group.add(textMesh5);
+
+     //alpha
+     var text = "α";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      }); 
+      var textMesh5 = new THREE.Mesh( textGeo, material );   
+
+      var x = (sphereRadius + 55)*Math.cos(aDegree*30);
+      var y = (sphereRadius + 55)*Math.sin(aDegree*30);
+      textMesh5.position.set(x,y,-20); 
+
+      textMesh5.rotation.x =  aDegree*90;
+      textMesh5.rotation.y =  aDegree*120;
+ 
+      group.add(textMesh5);
+
+     //delta
+     var text = "δ";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      }); 
+      var textMesh5 = new THREE.Mesh( textGeo, material );   
+
+      var alpha = aDegree * 30;
+      var delta = aDegree * 20; 
+
+      var x = 0;
+      var y = sphereRadius + 50;
+      var z = 0;
+
+      // x軸の周りを反時計回りで回す
+      var x1 = 0;
+      var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+      var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+      // z軸の周りを反時計回りで回す
+      var x3 = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+      var y3 = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+      var z3 = z1;  
+     
+     　textMesh5.position.set(x3,y3,z3); 
+
+      textMesh5.rotation.x =  aDegree*90;
+      textMesh5.rotation.y =  aDegree*120;
+ 
+      group.add(textMesh5);
+        
+  });
+
+
+  group.rotation.z = -aDegree*120;
+  group.rotation.x = aDegree*10;
+
+  scene.add( group );
+  
+  function render() {
+    requestAnimationFrame( render );
+
+    renderer.render( scene, camera );
+
+    controls.update();
+  }
+
+  render();
+}
+
+var proc3 = function(){
+  // シーン追加
+  var scene = new THREE.Scene();
+  // カメラを追加
+  var camera = new THREE.OrthographicCamera(  width / - 2, width / 2, height / 2, height / - 2, 1, 10000 );
+  camera.position.y = -1000;
+
+  // ライト追加
+  var ambLight = new THREE.AmbientLight(0xffff00, 1.0);
+  scene.add(ambLight);
+
+   // renderer 追加
+  var renderer = new THREE.WebGLRenderer();
+  renderer.setSize( width, height );
+  document.getElementById("canvas3").appendChild( renderer.domElement );
+  // control追加
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  
+  // グループ追加
+  var group = new THREE.Group();
+ 
+   // ** Celestial Sphere ******
+  var sphereGeo = new THREE.SphereGeometry( sphereRadius, 32, 32 );
+  var sphereMat = new THREE.MeshLambertMaterial( {
+    color: 0xffff00,
+    transparent: true,
+    opacity: 0.3
+  } );
+  // celestial sphere
+  var sphere = new THREE.Mesh( sphereGeo, sphereMat );
+  group.add( sphere );
+
+  /* *** Lines  ***** */
+
+  // ********* 天の赤道 ***********
+  material = new THREE.MeshLambertMaterial( {
+    color: 0xff0000
+  } );
+
+  var horison = new THREE.Geometry();
+    
+  var theta = 0;
+  var r = sphereRadius * Math.cos(theta);
+  var z = sphereRadius * Math.sin(theta); 
+
+  for (var j=0; j<=pi2; j+=aDegree){
+      var x = r*Math.cos(j);
+      var y = r*Math.sin(j);
+
+      horison.vertices.push(
+        new THREE.Vector3( x, y, z )
+      );
+  };
+  var horisonLine = new THREE.Line( horison, material );
+  group.add( horisonLine );
+ 
+  // ********* 経度度線 ***********
+  material = new THREE.MeshLambertMaterial( {
+    color: 0x00ff00
+  } );
+
+  var horison = new THREE.Geometry();
+    
+  var theta = 0;
+  var r = sphereRadius/2;
+  var z = r * Math.sin(theta); 
+
+  for (var j=60*aDegree; j<=aDegree*360; j+=aDegree){
+      var x = r*Math.cos(j);
+      var y = r*Math.sin(j);
+
+      horison.vertices.push(
+        new THREE.Vector3( x, y, z )
+      );
+  };
+  var horisonLine = new THREE.Line( horison, material );
+  group.add( horisonLine );
+ 
+  // XYZ線 **************
+  var lines = [];
+  material = new THREE.MeshLambertMaterial( {
+      color: 0xffffff
+  } );
+
+  for (var i = 1; i < xyz.length; i++) {
+    
+    lines[i] = new THREE.Geometry();
+    var x = 1.3*xyz[i].x;
+    var y = 1.3*xyz[i].y;
+    var z = 1.3*xyz[i].z;
+    lines[i].vertices.push(new THREE.Vector3( 0, 0, 0 ));
+    lines[i].vertices.push(new THREE.Vector3( x, y, z ));
+    var line = new THREE.Line( lines[i], material );
+    group.add( line );
+
+  };
+  // 東西南北線 **************
+  var lines = [];
+  material = new THREE.MeshLambertMaterial( {
+      color: 0xffffff
+  } );
+
+  for (var i = 1; i < news.length; i++) {
+    
+    lines[i] = new THREE.Geometry();
+    var x = news[i].x;
+    var y = news[i].y;
+    var z = news[i].z;
+    lines[i].vertices.push(new THREE.Vector3( 0, 0, 0 ));
+    lines[i].vertices.push(new THREE.Vector3( x, y, z ));
+    var line = new THREE.Line( lines[i], material );
+    group.add( line );
+
+  };
+  
+  // ********* 天体線 ***********
+  material = new THREE.MeshLambertMaterial( {
+    color: 0xffffff
+  } );
+
+  var body = new THREE.Geometry();
+    
+  var alpha = aDegree * 30;
+  var x = 0;
+  var y = sphereRadius;
+  var z = 0;
+
+  for (var delta=0; delta<=pi2/4; delta+=aDegree){
+      // x軸の周りを反時計回りで回す
+      var x1 = 0;
+      var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+      var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+      // z軸の周りを反時計回りで回す
+      var x3 = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+      var y3 = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+      var z3 = z1;  
+
+      body.vertices.push(
+        new THREE.Vector3( x3, y3, z3 )
+      );
+  };
+  
+  var bodyLine = new THREE.Line( body, material );
+  group.add( bodyLine );
+
+  // 高度線
+  deltaMat = new THREE.MeshLambertMaterial( {
+    color: 0x00ff00
+  } );
+  var deltaLine = new THREE.Geometry();
+    
+  var alpha = aDegree * 30;
+  var x = 0;
+  var y = sphereRadius + 50;
+  var z = 0;
+
+  for (var delta=0; delta<=aDegree*45; delta+=aDegree){
+      // x軸の周りを反時計回りで回す
+      var x1 = 0;
+      var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+      var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+      // z軸の周りを反時計回りで回す
+      var x3 = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+      var y3 = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+      var z3 = z1;  
+
+      deltaLine.vertices.push(
+        new THREE.Vector3( x3, y3, z3 )
+      );
+  };
+  var deltaLine = new THREE.Line( deltaLine, deltaMat );
+  group.add( deltaLine );
+
+
+  /* **** Points **** */
+
+  // 座標xyz  
+  var points = [];
+  for (var i = 0; i < xyz.length; i++) {
+
+    points[i] = new THREE.SphereGeometry( 4, 32, 32 );
+    var x = xyz[i].x;
+    var y = xyz[i].y;
+    var z = xyz[i].z;
+ 
+    var pointMesh = new THREE.Mesh( points[i], pointMaterial );
+    pointMesh.position.set(x, y, z) ; 
+    group.add(pointMesh);
+
+  };
+
+  // 東西南北  
+  var points = [];
+  for (var i = 0; i < news.length; i++) {
+
+    points[i] = new THREE.SphereGeometry( 4, 32, 32 );
+    var x = news[i].x;
+    var y = news[i].y;
+    var z = news[i].z;
+ 
+    var pointMesh = new THREE.Mesh( points[i], pointMaterial );
+    pointMesh.position.set(x, y, z) ; 
+    group.add(pointMesh);
+
+  };
+
+    // 天体点
+  var gamma = new THREE.SphereGeometry( 4, 32, 32 );
+  var pointMesh = new THREE.Mesh( gamma, pointMaterial );
+
+  var alpha = aDegree * 30;
+  var delta = aDegree * 45;
+
+  var x = 0;
+  var y = sphereRadius;
+  var z = 0;
+
+  // x軸の周りを反時計回りで回す
+  var x1 = 0;
+  var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+  var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+  // z軸の周りを反時計回りで回す
+  var x2 = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+  var y2 = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+  var z2 = z1;  
+
+  pointMesh.position.set(x2, y2, z2);
+  
+  group.add(pointMesh);
+
+  // 天体と天頂を通る大円と赤道の交点
+  var point = new THREE.SphereGeometry( 4, 32, 32 );
+  var pointMesh = new THREE.Mesh( point, pointMaterial );
+
+  var alpha = aDegree * 30;
+
+  var x = 0;
+  var y = sphereRadius;
+  var z = 0;
+
+  // z軸の周りを反時計回りで回す
+  var x3 = x*Math.cos(alpha) + y*Math.sin(alpha);
+  var y3 = x*Math.sin(alpha) + y*Math.cos(alpha);
+  var z3 = z;  
+
+  pointMesh.position.set(x3, y3, z3);
+  
+  group.add(pointMesh);
+
+  // 原点-交点
+  var gLine = new THREE.Geometry();
+    var x = 1.5*x3;
+    var y = 1.5*y3;
+    var z = 1.5*z3;
+    gLine.vertices.push(new THREE.Vector3( 0, 0, 0 ));
+    gLine.vertices.push(new THREE.Vector3( x, y, z ));
+    var line = new THREE.Line( gLine, material );
+  group.add( line );
+
+  // g線
+  var gLine = new THREE.Geometry();
+    var x = 1.5*x2;
+    var y = 1.5*y2;
+    var z = 1.5*z2;
+    gLine.vertices.push(new THREE.Vector3( 0, 0, 0 ));
+    gLine.vertices.push(new THREE.Vector3( x, y, z ));
+    var line = new THREE.Line( gLine, material );
+  group.add( line );
+
+  // **** 文字 *****
+  var loader = new THREE.FontLoader();
+  var font;
+  loader.load( '{{site.url}}/fonts/helvetiker_regular.typeface.json',   
+    function ( response ) {
+      font = response;
+      
+      material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+      // axis
+      for (var i = 0; i < xyz.length; i++) {
+        
+        var text = (i==0)?"O":(i==1)?"x":(i==2)?"y":"z";
+        var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+        });    
+        var textMesh1 = new THREE.Mesh( textGeo, material );
+
+        textMesh1.position.x = 1.3*xyz[i].x; 
+        textMesh1.position.y = 1.3*xyz[i].y;
+        textMesh1.position.z = 1.3*xyz[i].z;
+
+        textMesh1.rotation.x = pi2 / 4 ;
+        if ( i== 0) {
+          textMesh1.rotation.y = -aDegree*60;
+        } else {
+          textMesh1.rotation.y = -aDegree*(60+30*(3*i-2));
+        }
+        
+        group.add(textMesh1);
+      };
+
+      // 東西南北
+      for (var i = 0; i < news.length; i++) {
+        
+        var text = (i==0)?"S":(i==1)?"E":(i==2)?"N":"W";
+        var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+        });    
+        var textMesh1 = new THREE.Mesh( textGeo, material );
+
+        textMesh1.position.x = 1.1*news[i].x; 
+        textMesh1.position.y = 1.1*news[i].y;
+        textMesh1.position.z = 1.1*news[i].z;
+
+        textMesh1.rotation.x = pi2 / 4 ;
+        if ( i== 0) {
+          textMesh1.rotation.y = aDegree*90;
+        } else if ( i== 2) {
+          textMesh1.rotation.y = -aDegree*90;
+        } else {
+          textMesh1.rotation.y = aDegree*(90+45*(4*i-2));
+        }
+        
+        group.add(textMesh1);
+      };
+
+
+     // 天頂
+     var text = "Z";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      });    
+      var textMesh1 = new THREE.Mesh( textGeo, material );
+
+      textMesh1.position.x = 1.1*xyz[3].x; 
+      textMesh1.position.y = 1.1*xyz[3].y;
+      textMesh1.position.z = 1.1*xyz[3].z;
+
+      textMesh1.rotation.x = pi2 / 4 ;
+      textMesh1.rotation.y = -aDegree*(60+30*(3*3-2));
+        
+      group.add(textMesh1);
+ 
+     //天体
+     var text = "X(l,m,n)";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      }); 
+      var textMesh5 = new THREE.Mesh( textGeo, material );   
+
+      textMesh5.position.set(x2+15,y2+15,z2); 
+ 
+      textMesh5.rotation.x =  aDegree*90;
+      textMesh5.rotation.y =  aDegree*120;
+      group.add(textMesh5);
+
+     //g線
+     var text = "g";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      }); 
+      var textMesh5 = new THREE.Mesh( textGeo, material );   
+
+      textMesh5.position.set(1.5*x2+15,1.5*y2+15,1.5*z2); 
+
+      textMesh5.rotation.x =  aDegree*90;
+      textMesh5.rotation.y =  aDegree*120;
+ 
+      group.add(textMesh5);
+
+     //alpha
+     var text = "A";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      }); 
+      var textMesh5 = new THREE.Mesh( textGeo, material );   
+
+      var x = (sphereRadius/2)*Math.cos(aDegree*230);
+      var y = (sphereRadius/2)*Math.sin(aDegree*230);
+      textMesh5.position.set(x,y,0); 
+
+      textMesh5.rotation.x =  aDegree*90;
+      textMesh5.rotation.y =  aDegree*120;
+ 
+      group.add(textMesh5);
+
+     //delta
+     var text = "h";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      }); 
+      var textMesh5 = new THREE.Mesh( textGeo, material );   
+
+      var alpha = aDegree * 30;
+      var delta = aDegree * 20; 
+
+      var x = 0;
+      var y = sphereRadius + 50;
+      var z = 0;
+
+      // x軸の周りを反時計回りで回す
+      var x1 = 0;
+      var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+      var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+      // z軸の周りを反時計回りで回す
+      var x3 = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+      var y3 = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+      var z3 = z1;  
+     
+     　textMesh5.position.set(x3,y3,z3); 
+
+      textMesh5.rotation.x =  aDegree*90;
+      textMesh5.rotation.y =  aDegree*120;
+ 
+      group.add(textMesh5);
+        
+  });
+
+  group.rotation.z = -aDegree*120;
+  group.rotation.x = aDegree*10;
+
+  scene.add( group );
+  
+  function render() {
+    requestAnimationFrame( render );
+
+    renderer.render( scene, camera );
+
+    controls.update();
+  }
+
+  render();
+}
+
+/**
+   赤道座標と地平座標の関係　**/
+
+var proc4 = function(){
+  // シーン追加
+  var scene = new THREE.Scene();
+  // カメラを追加
+  var camera = new THREE.OrthographicCamera(  width / - 2, width / 2, height / 2, height / - 2, 1, 10000 );
+  camera.position.y = -1000;
+
+  // ライト追加
+  var ambLight = new THREE.AmbientLight(0xffff00, 1.0);
+  scene.add(ambLight);
+
+   // renderer 追加
+  var renderer = new THREE.WebGLRenderer();
+  renderer.setSize( width, height );
+  document.getElementById("canvas4").appendChild( renderer.domElement );
+  // control追加
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  
+  // グループ追加
+  var group = new THREE.Group();
+ 
+   // ** Celestial Sphere ******
+  var sphereGeo = new THREE.SphereGeometry( sphereRadius, 32, 32 );
+  var sphereMat = new THREE.MeshLambertMaterial( {
+    color: 0xffff00,
+    transparent: true,
+    opacity: 0.3
+  } );
+  // celestial sphere
+  var sphere = new THREE.Mesh( sphereGeo, sphereMat );
+  group.add( sphere );
+
+  /* *** Lines  ***** */
+
+  // ********* 地平線 ***********
+  material = new THREE.MeshLambertMaterial( {
+    color: 0x00ff00
+  } );
+
+  var horison = new THREE.Geometry();
+    
+  var theta = 0;
+  var r = sphereRadius * Math.cos(theta);
+  var z = sphereRadius * Math.sin(theta); 
+
+  for (var j=0; j<=pi2; j+=aDegree){
+      var x = r*Math.cos(j);
+      var y = r*Math.sin(j);
+
+      horison.vertices.push(
+        new THREE.Vector3( x, y, z )
+      );
+  };
+  var horisonLine = new THREE.Line( horison, material );
+  group.add( horisonLine );
+
+  // ********* 天の赤道 ***********
+  material = new THREE.MeshLambertMaterial( {
+    color: 0xff0000
+  } );
+
+  var equator = new THREE.Geometry();
+    
+  var theta = aDegree*35;
+  var r = sphereRadius;
+
+  for (var j=0; j<=pi2; j+=aDegree){
+      var x = r*Math.cos(j);
+      var y = r*Math.sin(j);
+      var z = 0;//r*Math.sin(j);
+
+      var x_e = x;
+      var y_e = y * Math.cos(theta) + z * Math.sin(theta);;
+      var z_e = y * Math.sin(theta) + z * Math.cos(theta);
+      equator.vertices.push(
+        new THREE.Vector3( x_e, y_e, z_e )
+      );
+  };
+  var equatorLine = new THREE.Line( equator, material );
+  group.add( equatorLine );
+ 
+  // ********* 経度度線 ***********
+  material = new THREE.MeshLambertMaterial( {
+    color: 0x00ff00
+  } );
+
+  var horison = new THREE.Geometry();
+    
+  var theta = 0;
+  var r = sphereRadius/2;
+  var z = r * Math.sin(theta); 
+
+  for (var j=60*aDegree; j<=aDegree*360; j+=aDegree){
+      var x = r*Math.cos(j);
+      var y = r*Math.sin(j);
+
+      horison.vertices.push(
+        new THREE.Vector3( x, y, z )
+      );
+  };
+  var horisonLine = new THREE.Line( horison, material );
+//  group.add( horisonLine );
+ 
+  // XYZ線 **************
+  var lines = [];
+  material = new THREE.MeshLambertMaterial( {
+      color: 0xffffff
+  } );
+
+  for (var i = 1; i < xyz.length; i++) {
+    
+    lines[i] = new THREE.Geometry();
+    var x = 1.3*xyz[i].x;
+    var y = 1.3*xyz[i].y;
+    var z = 1.3*xyz[i].z;
+    lines[i].vertices.push(new THREE.Vector3( 0, 0, 0 ));
+    lines[i].vertices.push(new THREE.Vector3( x, y, z ));
+    var line = new THREE.Line( lines[i], material );
+//    group.add( line );
+
+  };
+  // 東西南北線 **************
+  var lines = [];
+  material = new THREE.MeshLambertMaterial( {
+      color: 0xffffff
+  } );
+
+  for (var i = 1; i < news.length; i++) {
+    
+    lines[i] = new THREE.Geometry();
+    var x = news[i].x;
+    var y = news[i].y;
+    var z = news[i].z;
+    lines[i].vertices.push(new THREE.Vector3( 0, 0, 0 ));
+    lines[i].vertices.push(new THREE.Vector3( x, y, z ));
+    var line = new THREE.Line( lines[i], material );
+//    group.add( line );
+
+  };
+  
+  // ********* 天体線 ***********
+  material = new THREE.MeshLambertMaterial( {
+    color: 0xffffff
+  } );
+
+  var body = new THREE.Geometry();
+    
+  var alpha = aDegree * 30;
+  var x = 0;
+  var y = sphereRadius;
+  var z = 0;
+
+  for (var delta=0; delta<=pi2/4; delta+=aDegree){
+      // x軸の周りを反時計回りで回す
+      var x1 = 0;
+      var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+      var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+      // z軸の周りを反時計回りで回す
+      var x3 = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+      var y3 = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+      var z3 = z1;  
+
+      body.vertices.push(
+        new THREE.Vector3( x3, y3, z3 )
+      );
+  };
+  
+  var bodyLine = new THREE.Line( body, material );
+//  group.add( bodyLine );
+
+  // 高度線
+  deltaMat = new THREE.MeshLambertMaterial( {
+    color: 0x00ff00
+  } );
+  var deltaLine = new THREE.Geometry();
+    
+  var alpha = aDegree * 30;
+  var x = 0;
+  var y = sphereRadius + 50;
+  var z = 0;
+
+  for (var delta=0; delta<=aDegree*45; delta+=aDegree){
+      // x軸の周りを反時計回りで回す
+      var x1 = 0;
+      var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+      var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+      // z軸の周りを反時計回りで回す
+      var x3 = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+      var y3 = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+      var z3 = z1;  
+
+      deltaLine.vertices.push(
+        new THREE.Vector3( x3, y3, z3 )
+      );
+  };
+  var deltaLine = new THREE.Line( deltaLine, deltaMat );
+//  group.add( deltaLine );
+
+
+  /* **** Points **** */
+
+  // 座標xyz  
+  var points = [];
+  for (var i = 0; i < xyz.length; i++) {
+
+    points[i] = new THREE.SphereGeometry( 4, 32, 32 );
+    var x = xyz[i].x;
+    var y = xyz[i].y;
+    var z = xyz[i].z;
+ 
+    var pointMesh = new THREE.Mesh( points[i], pointMaterial );
+    pointMesh.position.set(x, y, z) ; 
+//    group.add(pointMesh);
+
+  };
+
+  // 東西南北  
+  var points = [];
+  for (var i = 0; i < news.length; i++) {
+
+    points[i] = new THREE.SphereGeometry( 4, 32, 32 );
+    var x = news[i].x;
+    var y = news[i].y;
+    var z = news[i].z;
+ 
+    var pointMesh = new THREE.Mesh( points[i], pointMaterial );
+    pointMesh.position.set(x, y, z) ; 
+//    group.add(pointMesh);
+
+  };
+
+    // 天体点
+  var gamma = new THREE.SphereGeometry( 4, 32, 32 );
+  var pointMesh = new THREE.Mesh( gamma, pointMaterial );
+
+  var alpha = aDegree * 30;
+  var delta = aDegree * 45;
+
+  var x = 0;
+  var y = sphereRadius;
+  var z = 0;
+
+  // x軸の周りを反時計回りで回す
+  var x1 = 0;
+  var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+  var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+  // z軸の周りを反時計回りで回す
+  var x2 = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+  var y2 = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+  var z2 = z1;  
+
+  pointMesh.position.set(x2, y2, z2);
+  
+ // group.add(pointMesh);
+
+  // 天体と天頂を通る大円と赤道の交点
+  var point = new THREE.SphereGeometry( 4, 32, 32 );
+  var pointMesh = new THREE.Mesh( point, pointMaterial );
+
+  var alpha = aDegree * 30;
+
+  var x = 0;
+  var y = sphereRadius;
+  var z = 0;
+
+  // z軸の周りを反時計回りで回す
+  var x3 = x*Math.cos(alpha) + y*Math.sin(alpha);
+  var y3 = x*Math.sin(alpha) + y*Math.cos(alpha);
+  var z3 = z;  
+
+  pointMesh.position.set(x3, y3, z3);
+  
+ // group.add(pointMesh);
+
+  // 原点-交点
+  var gLine = new THREE.Geometry();
+    var x = 1.5*x3;
+    var y = 1.5*y3;
+    var z = 1.5*z3;
+    gLine.vertices.push(new THREE.Vector3( 0, 0, 0 ));
+    gLine.vertices.push(new THREE.Vector3( x, y, z ));
+    var line = new THREE.Line( gLine, material );
+//  group.add( line );
+
+  // g線
+  var gLine = new THREE.Geometry();
+    var x = 1.5*x2;
+    var y = 1.5*y2;
+    var z = 1.5*z2;
+    gLine.vertices.push(new THREE.Vector3( 0, 0, 0 ));
+    gLine.vertices.push(new THREE.Vector3( x, y, z ));
+    var line = new THREE.Line( gLine, material );
+//  group.add( line );
+
+  // **** 文字 *****
+  var loader = new THREE.FontLoader();
+  var font;
+  loader.load( '{{site.url}}/fonts/helvetiker_regular.typeface.json',   
+    function ( response ) {
+      font = response;
+      
+      material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+      // axis
+      for (var i = 0; i < xyz.length; i++) {
+        
+        var text = (i==0)?"O":(i==1)?"x":(i==2)?"y":"z";
+        var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+        });    
+        var textMesh1 = new THREE.Mesh( textGeo, material );
+
+        textMesh1.position.x = 1.3*xyz[i].x; 
+        textMesh1.position.y = 1.3*xyz[i].y;
+        textMesh1.position.z = 1.3*xyz[i].z;
+
+        textMesh1.rotation.x = pi2 / 4 ;
+        if ( i== 0) {
+          textMesh1.rotation.y = -aDegree*60;
+        } else {
+          textMesh1.rotation.y = -aDegree*(60+30*(3*i-2));
+        }
+        
+        group.add(textMesh1);
+      };
+
+      // 東西南北
+      for (var i = 0; i < news.length; i++) {
+        
+        var text = (i==0)?"W":(i==1)?"S":(i==2)?"E":"N";
+        var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+        });    
+        var textMesh1 = new THREE.Mesh( textGeo, material );
+
+        textMesh1.position.x = 1.1*news[i].x; 
+        textMesh1.position.y = 1.1*news[i].y;
+        textMesh1.position.z = 1.1*news[i].z;
+
+        textMesh1.rotation.x = pi2 / 4 ;
+        if ( i== 0) {
+          textMesh1.rotation.y = aDegree*90;
+        } else if ( i== 2) {
+          textMesh1.rotation.y = -aDegree*90;
+        } else {
+          textMesh1.rotation.y = aDegree*(90+45*(4*i-2));
+        }
+        
+        group.add(textMesh1);
+      };
+
+
+     // 天頂
+     var text = "Z";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      });    
+      var textMesh1 = new THREE.Mesh( textGeo, material );
+
+      textMesh1.position.x = 1.1*xyz[3].x; 
+      textMesh1.position.y = 1.1*xyz[3].y;
+      textMesh1.position.z = 1.1*xyz[3].z;
+
+      textMesh1.rotation.x = pi2 / 4 ;
+      textMesh1.rotation.y = -aDegree*(60+30*(3*3-2));
+        
+      group.add(textMesh1);
+ 
+     //天体
+     var text = "X(l,m,n)";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      }); 
+      var textMesh5 = new THREE.Mesh( textGeo, material );   
+
+      textMesh5.position.set(x2+15,y2+15,z2); 
+ 
+      textMesh5.rotation.x =  aDegree*90;
+      textMesh5.rotation.y =  aDegree*120;
+      group.add(textMesh5);
+
+     //g線
+     var text = "g";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      }); 
+      var textMesh5 = new THREE.Mesh( textGeo, material );   
+
+      textMesh5.position.set(1.5*x2+15,1.5*y2+15,1.5*z2); 
+
+      textMesh5.rotation.x =  aDegree*90;
+      textMesh5.rotation.y =  aDegree*120;
+ 
+      group.add(textMesh5);
+
+     //alpha
+     var text = "A";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      }); 
+      var textMesh5 = new THREE.Mesh( textGeo, material );   
+
+      var x = (sphereRadius/2)*Math.cos(aDegree*230);
+      var y = (sphereRadius/2)*Math.sin(aDegree*230);
+      textMesh5.position.set(x,y,0); 
+
+      textMesh5.rotation.x =  aDegree*90;
+      textMesh5.rotation.y =  aDegree*120;
+ 
+      group.add(textMesh5);
+
+     //delta
+     var text = "h";
+     var textGeo = new THREE.TextGeometry( text, {
+          font: font,
+          size: 15,
+          height: 5
+      }); 
+      var textMesh5 = new THREE.Mesh( textGeo, material );   
+
+      var alpha = aDegree * 30;
+      var delta = aDegree * 20; 
+
+      var x = 0;
+      var y = sphereRadius + 50;
+      var z = 0;
+
+      // x軸の周りを反時計回りで回す
+      var x1 = 0;
+      var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+      var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+      // z軸の周りを反時計回りで回す
+      var x3 = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+      var y3 = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+      var z3 = z1;  
+     
+     　textMesh5.position.set(x3,y3,z3); 
+
+      textMesh5.rotation.x =  aDegree*90;
+      textMesh5.rotation.y =  aDegree*120;
+ 
+      group.add(textMesh5);
+        
+  });
+
+  group.rotation.z = -aDegree*120;
+  group.rotation.x = aDegree*30;
+  group.rotation.y = aDegree*00;
+
+  scene.add( group );
+  
+  function render() {
+    requestAnimationFrame( render );
+
+    renderer.render( scene, camera );
+
+    controls.update();
+  }
+
+  render();
+}
+
+
 proc1();
+proc2();
+proc3();
+proc4();
 
 
 // 方向余弦の計算
