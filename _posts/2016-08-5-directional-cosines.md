@@ -205,6 +205,24 @@ $$\sin h=n \quad -90°　\ge h \ge +90°　$$
 
 <div id="canvas4"></div>
 
+赤道座標系と地平座標系の位置関係は、
+
+2回の座標系の回転で関係づけられる。
+
+赤道座標系をZ軸を正の方向から見て反時計回りに\\( \theta \\)だけ回転した
+
+第2の座標系X'Y'Z'を考える
+
+このとき、X'軸は子午線上に、Y'軸は地平線上に来る
+
+はじめの赤道座標系において方向余弦(L, M, N)で示された天体の位置を
+
+X'Y'Z'座標系における方向余弦(L', M', Z')で表すと、　以下の関係で表せる
+
+
+
+
+
 <script src="//code.jquery.com/jquery-1.11.3.js"></script>
 <script src="{{site.url}}/js/three.js"></script>
 <script src="{{site.url}}/js/celestial-calc.js"></script>
@@ -1850,7 +1868,7 @@ var proc4 = function(){
         var theta_ = Math.asin(xyz[i].y/sphereRadius);
         
         //if ( xyz[i].x < 0) { theta_ += pi}
-        textMesh1.rotation.y = theta_ + pi/2;
+        //textMesh1.rotation.y = theta_ + aDegree*0;
          
         group.add(textMesh1);
       };
