@@ -371,3 +371,62 @@ function getDirCosines(alpha,delta){
 
 	return {L:L, M:M, N:N};
 };
+
+/*
+	****　赤道座標系の方向余弦を地平座標系の方向余弦に変換する
+
+	input parameters
+	赤道座標系の天体の方向余弦: 	L, M, N
+	Z軸を反時計回りでの角度　　　：　theta
+	y軸を反時計回りでの角度　　　：　phi
+
+	output 
+	地平座標系の方向余弦　　　　：　l, m, n
+*/
+
+function celesToHorison(L, M, N, theta, phi){
+	var theta_rad = theta * RadiansPerDegree;
+	var phi_rad = phi * RadiansPerDegree;
+	// z軸での回転
+	var L_ = L * Math.cos(theta_rad) + M * Math.sin(theta_rad);
+	var M_ = -L * Math.sin(theta_rad) + M * Math.cos(theta_rad);
+	var N_ = N;
+
+	//Y'軸での回転
+	var l = L_ * Math.sin(phi_rad) - N_ * Math.cos(phi_rad);
+	var m = M_;
+	var n =  L_* Math.cos(phi_rad) + N_ * Math.sin(phi_rad);
+
+	return {l:l, m:m, n:n};
+
+}
+
+/*
+	****　地平座標系の方向余弦を赤道座標系の方向余弦に変換する
+
+	input parameters
+	地平座標系の天体の方向余弦:　l, m, n
+	Z軸を反時計回りでの角度　　　：　theta
+	y軸を反時計回りでの角度　　　：　phi
+
+	output 
+	赤道座標系の方向余弦　　　　：　L, M, N
+*/
+
+function horisonToCeles(l, m, n, theta, phi){
+	var theta_rad = theta * RadiansPerDegree;
+	var phi_rad = phi * RadiansPerDegree;
+	
+	//Y'軸での回転
+	var l_ = l * Math.sin(phi_rad) - n * Math.cos(phi_rad);
+	var m_ = m;
+	var n_ = l* Math.cos(phi_rad) + n * Math.sin(phi_rad);
+
+	// z軸での回転
+	var L = l_ * Math.cos(theta_rad) + m_ * Math.sin(theta_rad);
+	var M = -l_ * Math.sin(theta_rad) + m_ * Math.cos(theta_rad);
+	var N = n_;
+
+	return {L:L, M:M, N:N};
+
+}

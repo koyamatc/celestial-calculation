@@ -21,17 +21,17 @@ layout: default
 		</ol>			
 	</div>
 	<div class="col-sm-4">
-		<h3><span class="label label-info">Tutorials</span></h3>
+		<h3><span class="label label-info">恒星位置のずれ</span></h3>
 		<ol class="post-list">
- 			{% for post in site.categories.tutorials %}
+ 			{% for post in site.categories.difference %}
    				<li><a href="{{ post.url }}">{{ post.postTitle }}</a></li>
  			{% endfor %}
 		</ol>			
 	</div>
 	<div class="col-sm-4">
-		<h3><span class="label label-info">Compositions</span></h3>
+		<h3><span class="label label-info">いろいろな時刻系</span></h3>
 		<ol class="post-list">
- 			{% for post in site.categories.compositions %}
+ 			{% for post in site.categories.time %}
    				<li><a href="{{ post.url }}">{{ post.postTitle }}</a></li>
  			{% endfor %}
 		</ol>			

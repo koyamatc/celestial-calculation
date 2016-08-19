@@ -194,7 +194,7 @@ $$m = -\cos h \sin A$$
 $$n = \sin h$$
 
 方向余弦から天体の方位角、高度を逆算するには
-$$\tan\A = \frac{m}{l}$$
+$$\tanA = \frac{m}{l}$$
 $$ \quad l \ge 0で、Aは第Ⅰ象限、または第Ⅳ象限$$
 $$ \quad l \lt 0で、Aは第Ⅱ象限、または第Ⅲ象限$$
 $$\sin h=n \quad -90°　\ge h \ge +90°　$$
@@ -217,7 +217,137 @@ $$\sin h=n \quad -90°　\ge h \ge +90°　$$
 
 はじめの赤道座標系において方向余弦(L, M, N)で示された天体の位置を
 
-X'Y'Z'座標系における方向余弦(L', M', Z')で表すと、　以下の関係で表せる
+X'Y'Z'座標系における方向余弦(L', M', Z')で表すと、　以下の関係となる
+
+\begin{eqnarray}
+   \left(
+     \begin{array}{c}
+       L' \\\
+       M' \\\
+       N'
+     \end{array}
+   \right)
+ = \left(
+     \begin{array}{c} 
+       \cos\theta &  \sin\theta & 0 \\\
+       -\sin\theta &  \cos \theta & 0 \\\
+       0 & 0 & 1 
+     \end{array}
+   \right)
+   \left(
+     \begin{array}{c}
+       L \\\
+       M \\\
+       N
+     \end{array}
+   \right)
+\end{eqnarray}
+
+次に X'Y'Z'座標系をY'軸を正の方向から見て反時計回りに\\( (90°-\varphi)\\)回転した
+座標系は、地平座標系xyzと一致する。
+
+この変換は
+
+\begin{eqnarray}
+  \left(
+     \begin{array}{c} 
+       \cos(90°-\varphi) &  0 & -\sin(90°-\varphi) \\\
+       0 & 1 & 0 \\\
+       \sin(90°-\varphi) &  0 & \cos (90°-\varphi) 
+     \end{array}
+   \right)
+ =
+   \left(
+     \begin{array}{c}
+       \sin(\varphi) &  0 & -\cos(\varphi) \\\
+       0 & 1 & 0 \\\
+       \cos(\varphi) &  0 & \sin (\varphi) 
+       \end{array}
+   \right)
+\end{eqnarray}
+
+したがって、地平座標系の方向余弦で表した天体の位置(l,m,n)は
+
+\begin{eqnarray}
+   \left(
+     \begin{array}{c}
+       l \\\
+       m \\\
+       n
+     \end{array}
+   \right)
+ = 
+   \left(
+     \begin{array}{c}
+       \sin(\varphi) &  0 & -\cos(\varphi) \\\
+       0 & 1 & 0 \\\
+       \cos(\varphi) &  0 & \sin (\varphi) 
+       \end{array}
+   \right)
+   \left(
+     \begin{array}{c}
+       L' \\\
+       M' \\\
+       N'
+     \end{array}
+   \right)
+ =
+   \left(
+     \begin{array}{c}
+       \sin(\varphi) &  0 & -\cos(\varphi) \\\
+       0 & 1 & 0 \\\
+       \cos(\varphi) &  0 & \sin (\varphi) 
+       \end{array}
+   \right)
+   \left(
+     \begin{array}{c} 
+       \cos\theta &  \sin\theta & 0 \\\
+       -\sin\theta &  \cos \theta & 0 \\\
+       0 & 0 & 1 
+     \end{array}
+   \right)
+   \left(
+     \begin{array}{c}
+       L \\\
+       M \\\
+       N
+     \end{array}
+   \right)      
+\end{eqnarray}
+
+ 地平座標系の方向余弦(l,m,n)を赤道座標系の方向余弦(L,M,N)に変換するには
+
+\begin{eqnarray}
+   \left(
+     \begin{array}{c}
+       L\\\
+       M \\\
+       N
+     \end{array}
+   \right)
+ =
+   \left(
+     \begin{array}{c} 
+       \cos\theta &  \sin\theta & 0 \\\
+       -\sin\theta &  \cos \theta & 0 \\\
+       0 & 0 & 1 
+     \end{array}
+   \right)
+   \left(
+     \begin{array}{c}
+       \sin(\varphi) &  0 & -\cos(\varphi) \\\
+       0 & 1 & 0 \\\
+       \cos(\varphi) &  0 & \sin (\varphi) 
+       \end{array}
+   \right)
+   \left(
+     \begin{array}{c}
+       l \\\
+       m \\\
+       n
+     \end{array}
+   \right)      
+\end{eqnarray}
 
 
 
@@ -2077,8 +2207,8 @@ $("#L").html("L=" + LMN.L);
 $("#M").html("M=" + LMN.M);
 $("#N").html("N=" + LMN.N);
 
-
-
-
+//赤道座標系方向余弦ー＞地平座標系方向余弦
+var pos = celesToHorison(LMN.L,LMN.M,LMN.N,223.032708,35.788889);
+console.log(pos);
 
 </script>
