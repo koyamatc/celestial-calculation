@@ -427,13 +427,28 @@
     .enter()
     .append("path")
     .attr("transform", function(d){
-      return xScale?"translate(" +
+
+      var xT = d.xTranslate?d.xTranslate:0;
+      var yT = d.yTranslate?d.yTranslate:0;
+
+      var rst;
+      /*
+       = xScale?"translate(" +
                         xScale(d.xTranslate?d.xTranslate:0) + "," + 
                         yScale(d.yTranslate?d.yTranslate:0) +")"
                       :"translate(" + 
                         d.xTranslate?d.xTranslate:0 + "," + 
-                        d.yTranslate?d.yTranslate:0 + ")"
-    ;})
+                        d.yTranslate?d.yTranslate:0 + ")";
+*/
+      if (xScale) {
+        rst = "translate(" + xScale(xT) + "," + yScale(yT) + ")"
+      } else {
+        rst = "translate(" + xT + "," + yT + ")"
+      }
+
+      console.log(rst);
+      return rst;
+      })
     .attr("d", arc)
     .attr("stroke",function(d){
       return d.stroke?d.stroke:"#000";})
