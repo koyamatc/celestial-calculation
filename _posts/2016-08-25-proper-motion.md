@@ -42,25 +42,104 @@ categories: difference
 この　\\(\mu\\)　を 全固有運動速度(tangential component of the proper motion)といい
 "/年　で表す
 
-全固有運動速度は、
-赤経方向に \\(\mu_{\alpha}\\) 
-赤緯方向に \\(\mu_{\delta}\\)
+全固有運動速度\\(\mu(\vec{QQ'})\\)は、2つの成分
+赤経方向に \\(\mu_{\alpha}(\vec{UQ'})\\) と
+赤緯方向に \\(\mu_{\delta}\vec{QU}\\)
 がある。
+
+$$ \mu = \mu_{\alpha} + \mu_{\delta}$$
 
 赤経は s/年  赤緯は　"/年　で表すことが多い
 
 <div id="canvas01"></div>
+
+
+-----------
+
+### 固有運動による位置変化
+
+恒星Q　の元期における赤経、赤緯を\\( ( \alpha_{0}, \delta_{0} ) \\) とし
+
+t年後の赤経、赤緯を\\( ( \alpha_{1}, \delta_{1} ) \\) とすると
+
+1.　元期における全固有運動速度 \\( \mu_{0} \\) と
+   固有運動の向き \\( \psi_{0} (\angle{UQQ'})\\) を求める    
+
+$$ \quad \mu_{0} = \sqrt{ \mu_{\alpha}^2 \cos^2{\delta_{0}}+\mu_{\delta}^2 } $$ 
+$$ \quad \tan{\psi_{0}} = \frac{ \mu_{\alpha}\cos{\delta_{0}} }{ \mu_{\delta} }$$
+
+$$\quad \mu \geqq 0 で \psi は第Ⅰ象限または第Ⅳ象限$$
+$$\quad \mu \lt 0 で \psi は第Ⅱ象限または第Ⅲ象限$$
+
+$$\quad \psi_{0}は、（\alpha_{0},\delta_{0}）を中心に原点Oから見て反時計回りに
+天の北極を0°として360°とる$$
+
+2.　ｔ年間で恒星が移動する角距離\\( \sigma \\) を計算する
+<div id="svg02"></div>
 
 年周視差 \\(\pi = \frac{a}{d}\\) 
 
 a:地球の軌道半径　
 d:恒星までの距離
 
------------
+$$\quad \tan{\sigma} = \frac{\mu_{0}t}{1+\frac{\pi R_{a}}{a}t}$$
+展開すると
+$$\quad \sigma = \mu_{0}t(1-\frac{\pi}{a}R_{a}t+\dotsb)
+\approx \mu_{0}t(1-\frac{\pi}{a}R_{a}t)
+$$
+ここまでで元期の位置\\((\alpha_{0},\delta_{0})\\)からの移動方向\\(\psi\\)と
+移動した角距離\\(\sigma\\)が求められる
 
-### 固有運動による位置変化
+3.　固有運動で移動した点\\((\alpha_{1},\delta_{1})\\)の方向余弦
+\\((L_{1},M_{1},N_{1})\\)を求める
 
+$$\quad
+L_{1}= \cos{\alpha_{0}}\cos{\delta_{0}}\cos{\sigma}
+- ( \sin{\alpha_{0}}\sin{\psi_{0}} 
++ \cos{\alpha_{0}}\sin{\delta_{0}}\cos{\psi_{0}})\sin{\sigma} 
+$$
+$$\quad
+M_{1}= \sin{\alpha_{0}}\cos{\delta_{0}}\cos{\sigma}
++ ( \cos{\alpha_{0}}\sin{\psi_{0}} 
++ \sin{\alpha_{0}}\sin{\delta_{0}}\cos{\psi_{0}})\sin{\sigma} 
+$$
+$$\quad
+N_{1}= \sin{\delta_{0}}\cos{\sigma}
++ \cos{\delta_{0}}\cos{\psi_{0}}\sin{\sigma} 
+$$
 
+ここから \\( (\alpha_{1},\delta_{1}) \\) が求められる
+
+-------
+
+### ベッセル年
+
+恒星の位置を示す\\((\alpha_{1950},\delta_{1950},)\\) の添え字　1950　は、
+正しくは 1950.0 と書くべきもので、
+これをベッセル年初(the beginning of the Besselian year)といい
+1950ベッセル年初の恒星の位置を示している
+
+ベッセル年初は１月１日付近ではあるが、時間は異なる
+
+通常の暦では１年は３６５日　または３６６日で、これでは計算に不向きである
+
+そのため天文の計算にはベッセル年単位を使用する
+
+１ベッセル年は、およそ３６５．２４２２日（一定ではない）
+
+-----
+
+<label class="label label-info">計算例</label>
+固有運動のずれだけを考慮し 61Cyg　が１９７８年５月１０日　２１時２０分にどこへ移動したか
+赤経、赤緯を計算する
+
+１．　時間間隔 t を計算
+
+１９５０ベッセル年初から、１９７８年５月１０日　２１時２０分までの時間を計算する
+
+１ベッセル年は365.2422日とする
+
+t=<span id="bessel-year"></span>
 
 <script src="//code.jquery.com/jquery-1.11.3.js"></script>
 <script src="{{site.url}}/js/three.js"></script>
@@ -86,32 +165,46 @@ var svg01 = d3.select("#svg01").append("svg")
               .attr("height", 200)
               .attr("width", 500)
               .style("background","#000");
+var svg02 = d3.select("#svg02").append("svg")
+              .attr("height", 200)
+              .attr("width", 500)
+              .style("background","#000");
 
 var lineData01 = [
 {"x1":50,"y1":50,"x2":400,"y2":50,"stroke":"#fff"},
 {"x1":50,"y1":50,"x2":450,"y2":150,"stroke":"#fff"}
 ];    
 drawLine(svg01,lineData01);
+drawLine(svg02,lineData01);
 
 var vecData01 = [
 {"x1":400,"y1":50,"angles":64,"length":Math.sqrt(12500),"stroke":"#fff"},
 {"x1":400,"y1":50,"angles":0,"length":50,"stroke":"#fff"},
 {"x1":450,"y1":50,"angles":90,"length":100,"stroke":"#fff"}
 ];    
-drawVectorA(svg01,vecData01);             
+drawVectorA(svg01,vecData01);
+drawVectorA(svg02,vecData01);    
 
 var arcData01 = [
 {"startPos":90,"endPos":104,"innerRadius":200,"outerRadius":200,
 "stroke":"#fff","xTranslate":50,"yTranslate":50},
 ];  
 drawArc(svg01,arcData01);
+var arcData02 = [
+{"startPos":90,"endPos":104,"innerRadius":200,"outerRadius":200,
+"stroke":"#fff","xTranslate":50,"yTranslate":50},
+{"startPos":90,"endPos":155,"innerRadius":30,"outerRadius":30,
+"stroke":"#fff","xTranslate":400,"yTranslate":50},
+];  
+drawArc(svg02,arcData02);
 
 var circleData01 = [
 {"cx":50,"cy":50,"r":3,"stroke":"#fff","fillColor":"#fff"},
 {"cx":400,"cy":50,"r":3,"stroke":"#fff","fillColor":"#fff"},
 ];
-
 drawCircle(svg01,circleData01);
+drawCircle(svg02,circleData01);
+
 var mathData01 = [
 {"x":45,"y":-15,"text":"$$O(観測者)$$","fontSize":16},
 {"x":340,"y":-15,"text":"$$(恒星)Q$$","fontSize":16},
@@ -122,6 +215,20 @@ var mathData01 = [
 {"x":225,"y":20,"text":"$$\\mu$$","fontSize":16},
 ];
 drawMathjax(svg01,mathData01);
+var mathData02 = [
+{"x":45,"y":-15,"text":"$$O(観測者)$$","fontSize":16},
+{"x":390,"y":-15,"text":"$$Q_{0}$$","fontSize":16},
+{"x":415,"y":10,"text":"$$\\theta$$","fontSize":16},
+{"x":450,"y":100,"text":"$$Q$$","fontSize":16},
+{"x":405,"y":-40,"text":"$$vt\\cos{\\theta}$$","fontSize":16},
+{"x":405,"y":-25,"text":"$$=R_{a}t$$","fontSize":16},
+{"x":225,"y":-35,"text":"$$d=\\frac{a}{\\pi}$$","fontSize":16},
+{"x":455,"y":35,"text":"$$vt\\sin{\\theta}$$","fontSize":16},
+{"x":455,"y":55,"text":"$$=\\frac{a}{\\pi}\\mu_{0}t$$","fontSize":16},
+{"x":400,"y":40,"text":"$$vt$$","fontSize":16},
+{"x":225,"y":20,"text":"$$\\sigma$$","fontSize":16},
+];
+drawMathjax(svg02,mathData02);
 
 
 var height = 500,
@@ -131,11 +238,12 @@ var pi = Math.PI;
 var aDegree = Math.PI / 180;
 var decStep = Math.PI / 18;
 
-function Point(x,y,z,label){
+function Point(x,y,z,label, r){
   this.x = x;
   this.y = y;
   this.z = z;
   this.label = label;
+  this.r = r;
 };
   // variables
   var sphereRadius = 200,
@@ -218,7 +326,7 @@ var proc1 = function(){
   
   pointsData.push(new Point(x_, y_, z_, "γ"));
  
-  // 天体　Q
+  // 天体　Q0
   var alpha = aDegree * 45;
   var delta = aDegree * 30;
 
@@ -258,7 +366,73 @@ var proc1 = function(){
 
   pointsData.push(new Point(x_, y_, z_, "Q'"));
 
+  // U
+  var alpha = aDegree * 45;
+  var delta = aDegree * 50;
+
+  var x = 0;
+  var y = sphereRadius;
+  var z = 0;
+
+  // x軸の周りを反時計回りで回す
+  var x1 = 0;
+  var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+  var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+  // z軸の周りを反時計回りで回す
+  var x_ = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+  var y_ = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+  var z_ = z1;  
+
+  pointsData.push(new Point(x_, y_, z_, "U", 0));
+
+  // ミュ-
+  var alpha = aDegree * 30;
+  var delta = aDegree * 30;
+
+  var x = 0;
+  var y = sphereRadius;
+  var z = 0;
+
+  // x軸の周りを反時計回りで回す
+  var x1 = 0;
+  var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+  var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+  // z軸の周りを反時計回りで回す
+  var x_ = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+  var y_ = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+  var z_ = z1;  
+
+  pointsData.push(new Point(x_, y_, z_, "μ", 0));
+  
+  // ψ
+  var alpha = aDegree * 40;
+  var delta = aDegree * 35;
+
+  var x = 0;
+  var y = sphereRadius;
+  var z = 0;
+
+  // x軸の周りを反時計回りで回す
+  var x1 = 0;
+  var y1 = y*Math.cos(delta) + z*Math.sin(delta);
+  var z1 = y*Math.sin(delta) + z*Math.cos(delta);  
+
+  // z軸の周りを反時計回りで回す
+  var x_ = x1*Math.cos(alpha) + y1*Math.sin(alpha);
+  var y_ = x1*Math.sin(alpha) + y1*Math.cos(alpha);
+  var z_ = z1;  
+
+  pointsData.push(new Point(x_, y_, z_, "ψ", 0));
+
+  //  Draw points 
   for (var i = 0; i < pointsData.length; i++) {
+
+    var r = (pointsData[i].r==undefined)?4:pointsData[i].r;
+    var pointGeometry = new THREE.SphereGeometry( r, 32, 32 );
+
+    if (r) {
 
     var x = pointsData[i].x;
     var y = pointsData[i].y;
@@ -266,7 +440,9 @@ var proc1 = function(){
  
     var pointMesh = new THREE.Mesh( pointGeometry, pointMaterial );
     pointMesh.position.set(x, y, z) ; 
+
     group.add(pointMesh);
+    }
 
   };
 
@@ -360,8 +536,8 @@ var proc1 = function(){
   group.add( bodyLine );
 
   // ********* 天体 Q 全固有運動速度 ***********
-  material = new THREE.MeshLambertMaterial( {
-    color: 0xffffff
+  material = new THREE.LineBasicMaterial( {
+    color: 0xff0000
   } );
 
   var mu = new THREE.Geometry();
@@ -393,8 +569,10 @@ var proc1 = function(){
   group.add( muLine );
 
   // ********* mu delta ***********
-  material = new THREE.MeshLambertMaterial( {
-    color: 0xffffff
+  material = new THREE.LineDashedMaterial( {
+    color: 0x00ff00,
+    scale: 3,
+    gapSize: 5
   } );
 
   var mu = new THREE.Geometry();
@@ -515,4 +693,8 @@ var proc1 = function(){
 
 
 proc1();
+
+var dt0 = new Date(1950,1,1,0,0,0);
+var dt1 = new Date(1978,6,10,21,10,0);
+getPeriodByBessel(dt0, dt1);
 </script>

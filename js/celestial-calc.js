@@ -232,6 +232,21 @@ function getMeanSiderealTime(datetime){
 	return {time:workTime,degrees:workDegree}
 }
 
+/* 
+	ベッセル年による時間間隔の取得 
+*/
+function getPeriodByBessel(dt0, dt1){
+
+	var besselYear = 365.2422 * 60 * 60 * 24 * 1000;
+	var interval = dt1.getYear() - dt0.getYear();
+
+	console.log(interval);
+
+	// target年のベッセル年初
+	
+
+}
+
 function displayTime(time){
 		var interval = time;
 		var days = Math.floor(interval / msecPerDay );
@@ -430,3 +445,4 @@ function horisonToCeles(l, m, n, theta, phi){
 	return {L:L, M:M, N:N};
 
 }
+
