@@ -237,14 +237,17 @@ function getMeanSiderealTime(datetime){
 */
 function getPeriodByBessel(dt0, dt1){
 
-	var besselYear = 365.2422 * 60 * 60 * 24 * 1000;
+	var besselYear = 365.2422 * msecPerDay;
 	var interval = dt1.getYear() - dt0.getYear();
 
-	console.log(interval);
 
 	// target年のベッセル年初
-	
+	var beginningOfBessel = new Date(dt1.getYear(),1,1,1,54,9);
+	var difference = (dt1.getTime() - beginningOfBessel.getTime())
+									 + msecPerDay;
+	interval += difference/besselYear;									  
 
+	return interval;	
 }
 
 function displayTime(time){
@@ -261,7 +264,7 @@ function displayTime(time){
 		var seconds = Math.floor(interval / 1000 );
 		interval = interval - (seconds * 1000); 
 
-		console.log(hours + "h" + minutes + "m" + seconds + "s" + interval);
+		console.log(days + "日" + hours + "h" + minutes + "m" + seconds + "s" + interval);
 
 		return {
 			hours : hours,

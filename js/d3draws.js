@@ -446,7 +446,6 @@
         rst = "translate(" + xT + "," + yT + ")"
       }
 
-      console.log(rst);
       return rst;
       })
     .attr("d", arc)

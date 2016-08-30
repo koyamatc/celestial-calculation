@@ -101,7 +101,7 @@ $$
 $$\quad
 M_{1}= \sin{\alpha_{0}}\cos{\delta_{0}}\cos{\sigma}
 + ( \cos{\alpha_{0}}\sin{\psi_{0}} 
-+ \sin{\alpha_{0}}\sin{\delta_{0}}\cos{\psi_{0}})\sin{\sigma} 
+- \sin{\alpha_{0}}\sin{\delta_{0}}\cos{\psi_{0}})\sin{\sigma} 
 $$
 $$\quad
 N_{1}= \sin{\delta_{0}}\cos{\sigma}
@@ -130,16 +130,73 @@ $$
 -----
 
 <label class="label label-info">計算例</label>
-固有運動のずれだけを考慮し 61Cyg　が１９７８年５月１０日　２１時２０分にどこへ移動したか
+固有運動のずれだけを考慮し 61Cyg　が１９７８年６月１０日　２１時２０分にどこへ移動したか
 赤経、赤緯を計算する
 
-１．　時間間隔 t を計算
 
-１９５０ベッセル年初から、１９７８年５月１０日　２１時２０分までの時間を計算する
+１９５０ベッセル年初から、１９７８年６月１０日　２１時２０分までの時間を計算する
 
 １ベッセル年は365.2422日とする
 
-t=<span id="bessel-year"></span>
+t=<span id="period"></span>
+
+61Cyg は　1950ベッセル年初の位置は
+$$\alpha_{0} = 316.166396°$$
+
+\\( \cos\alpha_{0}=\\)  <span id="cos_alpha0"></span> 
+
+\\( \sin\alpha_{0}=\\)  <span id="sin_alpha0"></span>
+
+$$\delta_{0} = 38.499750°$$
+\\( \cos\delta_{0}=\\)  <span id="cos_delta0"></span>
+
+\\( \sin\delta_{0}=\\)  <span id="sin_delta0"></span>
+
+固有運動量は
+$$ \mu_{\alpha}=0.35227s/年=0.0014678°/年$$
+$$ \mu_{\delta}=3.1847"/年=0.00088464°/年$$
+$$ \mu_{\alpha}\cos \delta_{0} = 0.0018487°/年$$
+$$ R_{\alpha} = -64.3km/秒$$
+$$ \pi = 0.296" = 1.435 \times 10^{-6} (rad)$$
+$$ 地球軌道半径a=1.496 \times 10^{8}km$$
+
+これを使って
+
+\\( \mu_{0}=\\)<span id="mu0"></span>
+
+\\( \tan\psi_{0}=\\)<span id="tan_psi0"></span>
+
+ここから
+
+\\( \psi_{0}=\\)<span id="psi0"></span>
+
+\\( \cos\psi_{0}=\\)<span id="cos_psi0"></span>
+
+\\( \sin\psi_{0}=\\)<span id="sin_psi0"></span>
+
+\\( \sigma=\\)<span id="sigma"></span>
+
+\\( \cos\sigma=\\)<span id="cos_sigma"></span>
+
+\\( \sin\sigma=\\)<span id="sin_sigma"></span>
+
+移動した後の赤道座標系の方向余弦(\\(L_{1},M_{1},N_{1}\\))は
+
+\\(L_{1}=\\)<span id="L1"></span>
+
+\\(M_{1}=\\)<span id="M1"></span>
+
+\\(N_{1}=\\)<span id="N1"></span>
+
+ここから　移動後の赤経\\(\alpha_{1}\\) と　赤緯\\( \delta_{1}\\) は
+
+\\( \tan \alpha_{1}= \\) <span id="tan_alpha1"></span>
+
+\\( \alpha_{1}= \\) <span id="alpha1"></span>
+
+\\( \sin \delta_{1}= \\) <span id="sin_delta1"></span>
+
+\\( \delta_{1}= \\) <span id="delta1"></span>
 
 <script src="//code.jquery.com/jquery-1.11.3.js"></script>
 <script src="{{site.url}}/js/three.js"></script>
@@ -694,7 +751,79 @@ var proc1 = function(){
 
 proc1();
 
+var cyg_alpha0 = 316.166396 * aDegree;
+var cyg_delta0 = 38.499750 * aDegree;
+
 var dt0 = new Date(1950,1,1,0,0,0);
-var dt1 = new Date(1978,6,10,21,10,0);
-getPeriodByBessel(dt0, dt1);
+var dt1 = new Date(1978,6,10,21,20,0);
+var t = getPeriodByBessel(dt0, dt1);
+
+$("#period").html(t);
+
+var cos_alpha0 = Math.cos(cyg_alpha0);
+var sin_alpha0 = Math.sin(cyg_alpha0);
+$("#cos_alpha0").html(cos_alpha0);
+$("#sin_alpha0").html(sin_alpha0);
+
+var cos_delta0 = Math.cos(cyg_delta0);
+var sin_delta0 = Math.sin(cyg_delta0);
+$("#cos_delta0").html(cos_delta0);
+$("#sin_delta0").html(sin_delta0);
+
+var mu_alpha = 0.0014678;
+var mu_delta = 0.00088464;
+var mu_alpha_cos_delta0 = mu_alpha * cos_delta0;    
+var ra = -64.3;
+var pi0 = .000001435;
+var earth_a = 1.496 * 100000000;
+
+var mu0 = Math.sqrt(mu_alpha_cos_delta0*mu_alpha_cos_delta0 + mu_delta*mu_delta);
+$("#mu0").html(mu0);
+
+var tan_psi0 = mu_alpha_cos_delta0 / mu_delta;
+$("#tan_psi0").html(tan_psi0);
+
+var psi0 = Math.atan(tan_psi0);
+$("#psi0").html(psi0/aDegree);
+
+var cos_psi0_ = Math.cos(psi0);
+$("#cos_psi0").html(cos_psi0_);
+var sin_psi0_ = Math.sin(psi0);
+$("#sin_psi0").html(sin_psi0_);
+
+var secPerBesselYear = 365.2422 * 3600 * 24;
+var t_ = t * secPerBesselYear;
+var sigma_ =  1 - ((pi0/earth_a) * ra * t_);
+var sigma = mu0 * t * sigma_;
+$("#sigma").html(sigma);
+
+var cos_sigma = Math.cos(sigma*aDegree);
+var sin_sigma = Math.sin(sigma*aDegree);
+$("#cos_sigma").html(cos_sigma);
+$("#sin_sigma").html(sin_sigma);
+
+var L1 = cos_alpha0 * cos_delta0 * cos_sigma
+        - (sin_alpha0 * sin_psi0_ + cos_alpha0 * sin_delta0 * cos_psi0_) * sin_sigma;
+var M1 = sin_alpha0 * cos_delta0 * cos_sigma
+        + (cos_alpha0 * sin_psi0_ - sin_alpha0 * sin_delta0 * cos_psi0_) * sin_sigma;
+var N1 =  sin_delta0 * cos_sigma + cos_delta0 * cos_psi0_ * sin_sigma;
+
+$("#L1").html(L1);
+$("#M1").html(M1);
+$("#N1").html(N1);
+
+var tan_alpha1 = M1 / L1;
+var alpha1 = Math.atan(tan_alpha1);
+var alpha1_= 360 + alpha1/aDegree;
+$("#tan_alpha1").html(tan_alpha1);
+$("#alpha1").html(alpha1_ + "°");
+
+var sin_delta1 = N1;
+var delta1 = Math.asin(sin_delta1);
+$("#sin_delta1").html(sin_delta1);
+$("#delta1").html(delta1/aDegree + "°");
+
+
+
+console.log(t);
 </script>
