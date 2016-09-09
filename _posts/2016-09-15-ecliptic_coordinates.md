@@ -2,11 +2,23 @@
 title: 2体問題
 layout: post
 date: 2016-09-15 23:00:00
-postTitle: 黄道座標系
+postTitle: 黄道座標系　（ecliptic coordinates system）
 categories: 2bodies
 ---
 
 -------
+
+### 1.横径、黄緯
+
+恒星の位置を表すのに赤道座標系を使用したが
+
+太陽系内の天体の位置を表すのには黄道座標系を使うのが便利
+
+太陽の中心が天球上を動いていく大円が黄道であり
+
+これは、地球の軌道平面が天球と交わる大円といえる
+
+春分点と黄道により黄道座標系は定義される
 
 <div id="canvas01"></div>
 
@@ -16,7 +28,156 @@ K: 黄道の北極
 k': 黄道の南極
 γ: 春分点
 
+天の赤道と黄道は黄道傾角 \\( \epsilon (約23.5°)\\) をなし交わっている
 
+春分点と秋分点を軸に 角度　\\( \epsilon \\)回転させると
+
+天の北極P は　黄道の北極K　に、　天の南極P' は 黄道の南極K'へ移動する
+
+こうして移動した座標系が黄道座標系となる
+
+赤道座標系で黄道の北極、南極を表すと
+
+黄道の北極( \\( \alpha=18h, \delta=90°-\epsilon \\) )、
+黄道の南極( \\( \alpha=6h, \delta=\epsilon-90° \\) )
+
+天体Xの位置は次のように表せる
+
+KXK'を通る大円の半分が黄道と交わる点をCとする
+
+春分点\\( \gamma\\) から東向きに図った角距離　\\( \gamma C\\)　を
+天体Xの横径(celestial longitude)
+
+角距離CX を黄緯(celestial latitude)
+
+Xが黄道の北側にある時は黄緯は正、南側にあるときは負の値をとる
+
+横径は\\( \lambda \\)　で、黄緯は\\( \beta \\) で表す
+
+\\( 0° \ge \lambda \ge 360° \\),
+\\( -90° \ge \beta \ge +90° \\)
+
+これで天体の位置を\\( (\lambda,\beta) \\) で表せるが
+
+例外が黄道の極K,K'で　\\( \lambda \\)が定義できず、
+Kは\\( \beta=90° \\), K'は\\( \beta=-90° \\) とする
+
+---------
+
+### 2. 黄道座標と赤道座標の変換
+
+観測点Oを原点として、春分点の方向にX軸、
+横径90°、黄緯0°方向にY軸、
+黄道の北極方向にZ軸をとったものが
+
+黄道直行座標系です
+
+この座標系にある天体X \\( (\lambda,\beta) \\)の方向余弦(U,V,W) は
+
+$$
+\left.
+\begin{array}{l}
+U=\cos \beta \cos \lambda \\\
+V=\cos \beta \sin \lambda \\\
+W=\sin \beta
+\end{array}
+\right
+\rbrace
+$$
+
+この天体Xの赤道座標系における方向余弦を(L,M,N)とすると
+
+赤道座標を\\( \epsilon \\)X軸で回転させると黄道座標に重ねることができるので
+
+\begin{eqnarray}
+   \left(
+     \begin{array}{c}
+       U \\\
+       V \\\
+       W
+     \end{array}
+   \right)
+ = \left(
+     \begin{array}{c}
+       1 & 0 & 0 \\\
+       0 & \cos\epsilon & \sin\epsilon \\\
+       0 & -\sin\epsilon & \cos \epsilon
+     \end{array}
+   \right)
+   \left(
+     \begin{array}{c}
+       L \\\
+       M \\\
+       N
+     \end{array}
+   \right)
+\end{eqnarray}
+
+または
+
+$$
+\left.
+\begin{array}{l}
+U=L \\\
+V=M\cos \epsilon +  N\sin \epsilon \\\
+W=-M\sin \epsilon + N\cos \epsilon
+\end{array}
+\right
+\rbrace
+$$
+
+ここから
+
+$$
+\left.
+\begin{array}{l}
+\tan \lambda = U/V \\\
+\quad U\ge0で\lambdaは第1象限または第4象限 \\\
+\quad U\lt0で\lambdaは第2象限または第3象限 \\\
+\sin \beta = W, \quad -90° \ge \beta \ge 90°
+\end{array}
+\right
+\rbrace
+$$
+
+黄道座標を赤道座標に変換するには
+
+\begin{eqnarray}
+   \left(
+     \begin{array}{c}
+       L \\\
+       M \\\
+       N
+     \end{array}
+   \right)
+ = \left(
+     \begin{array}{c}
+       1 & 0 & 0 \\\
+       0 & \cos\epsilon & -\sin\epsilon \\\
+       0 & \sin\epsilon & \cos \epsilon
+     \end{array}
+   \right)
+   \left(
+     \begin{array}{c}
+       U \\\
+       V \\\
+       W
+     \end{array}
+   \right)
+\end{eqnarray}
+
+または
+
+$$
+\left.
+\begin{array}{l}
+L=U \\\
+M=V\cos \epsilon -  W\sin \epsilon \\\
+N=V\sin \epsilon + W\cos \epsilon
+\end{array}
+\right
+\rbrace
+$$
 
 <label class="label label-info">計算例</label>　
 
