@@ -99,9 +99,9 @@ $$
 
 $$
 u = l + (e - \frac{1}{8}e^3 + \frac{1}{192}e^5 - \frac{1}{9216}e^7)\sin l 
-      + (\frac{1}{2}e^2 - \frac{1}{6}e^4 + \frac{1}{48}e^6) \sin 2l 
+      + (\frac{1}{2}e^2 - \frac{1}{6}e^4 + \frac{1}{48}e^6) \sin 2l \\\
       + (\frac{3}{8}e^2 - \frac{27}{128}e^4 + \frac{243}{5120}e^6) \sin 3l
-      + (\frac{1}{3}e^4 - \frac{4}{15}e^6) \sin 4l 
+      + (\frac{1}{3}e^4 - \frac{4}{15}e^6) \sin 4l \\\
       + (\frac{125}{384}e^5 - \frac{3125}{9216}e^7) \sin 5l 
       + \frac{27}{80}e^6 \sin 6l
       + \frac{16807}{46080}e^7 \sin 7l
@@ -123,7 +123,44 @@ e が　１に近い彗星の場合は、図による解法がある
 
 離心近点角　\\(u\\) と　真近点角 \\(f\\) の関係は
 
+$$
+\left.
+\begin{array}{l}
+\sin f = \sqrt{1 - e^2} \sin u / (1 - e \cos u) \\\
+\cos f = (\cos u - e) / (1 - e\cos u) \\\
+\tan f = \sqrt{1 - e^2} \sin u / (\cos u - e)
+\end{array}
+\right
+\rbrace
+$$
 
+\\( \qquad \cos u - e \ge 0 \\) で、　\\(f\\) は、第１、第４象限
+
+\\( \qquad \cos u - e \lt 0 \\) で、　\\(f\\) は、第２、第３象限
+
+動径 \\(r\\) は　\\(f \\) からも \\(u\\) からも計算できて
+$$
+\left.
+\begin{array}{l}
+r = a( 1 - e\cos u ) \\\
+r = a( 1 - e^2) / ( 1 + e\cos f )
+\end{array}
+\right
+\rbrace
+$$
+
+惑星の \\(x,y\\) 座標は
+$$
+\left.
+\begin{array}{l}
+x = r\cos f = a( \cos u - e ) \\\
+y = r\sin f = a \sqrt{1 - e^2} \sin u
+\end{array}
+\right
+\rbrace
+$$
+
+<label class="label label-info">計算例</label>
 
 
 
