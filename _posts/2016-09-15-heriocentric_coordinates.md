@@ -497,6 +497,30 @@ var proc1 = function(){
   };
   var orbitLine = new THREE.Line( orbit, material );
   group.add( orbitLine );
+
+// ********* Omega Line ***********
+  material = new THREE.MeshLambertMaterial( {
+    color: 0xff00ff
+  } );
+  var Omega = new THREE.Geometry();
+    
+  var theta = aDegree*23.5;
+  var r = sphereRadius * 0.8;
+
+  for (var j=0; j<=aDegree*150; j+=aDegree){
+      var x = r*Math.cos(j);
+      var y = r*Math.sin(j);
+      var z = 0;
+
+      var x_e = x;
+      var y_e = y * Math.cos(theta) + z * Math.sin(theta);;
+      var z_e = y * Math.sin(theta) + z * Math.cos(theta);
+      Omega.vertices.push(
+        new THREE.Vector3( x_e, y_e, z_e )
+      );
+  };
+  var OmegaLine = new THREE.Line( Omega, material );
+  group.add( OmegaLine );
  
   // Xc,Yc軸
   material = new THREE.MeshLambertMaterial( {
@@ -601,6 +625,63 @@ var proc1 = function(){
   pointsData.push( new Point( 0, 0, axisLength, "Zc" ));
   pointsData.push( new Point( 1.3*x_gamma, 1.3*y_gamma, 1.3*z_gamma, "Xc" ));
   pointsData.push( new Point( 1.05*x_Yc, 1.05*y_Yc, 1.05*z_Yc, "Yc" ));
+  // North Pole
+  pointsData.push(new Point( 0, 0, sphereRadius, "K" ));
+  // 黄道
+  var A = aDegree * 20;
+  var x = sphereRadius*Math.cos(0);
+  var y = 0;
+  var z = 0;
+  var x_E = x*Math.cos(A) - y*Math.sin(A);
+  var y_E = x*Math.sin(A) + y*Math.cos(A);
+  var z_E = 0;
+  pointsData.push(new Point(x_E, y_E, z_E, "Ecliptic"));
+
+  // Orbit
+  var theta = aDegree*23.5;
+  var theta2 = aDegree*150; // Omega
+  var majorAxis = 100;
+  var eccentricity = 0.7; 
+
+      var r = majorAxis * (1 - eccentricity * eccentricity) / (1 + eccentricity * Math.cos(pi2/3));
+      var x = r*Math.cos(pi2/3);
+      var y = r*Math.sin(pi2/3);
+      var z = 0;
+ 
+      var x_ = x * Math.cos(theta2) - y * Math.sin(theta2);
+      var y_ = x * Math.sin(theta2) + y * Math.cos(theta2);
+      var z_ = z;
+
+      var x_O = x_;
+      var y_O = y_ * Math.cos(theta) + z_ * Math.sin(theta);
+      var z_O = y_ * Math.sin(theta) + z_ * Math.cos(theta);
+  pointsData.push(new Point(x_O, y_O, z_O, "Orbit"));
+
+  // Omega
+  var theta = aDegree*23.5;
+  var r = sphereRadius * 0.8;
+  var j=aDegree*30;
+      var x = r*Math.cos(j);
+      var y = r*Math.sin(j);
+      var z = 0;
+
+      var x_omega = x;
+      var y_omega = y * Math.cos(theta) + z * Math.sin(theta);;
+      var z_omega = y * Math.sin(theta) + z * Math.cos(theta);
+  pointsData.push(new Point(x_omega, y_omega, z_omega, "Ω"));
+
+  // inclination
+  var theta = aDegree*16
+  var r = sphereRadius;
+  var j=aDegree*15;
+      var x = r*Math.cos(j);
+      var y = r*Math.sin(j);
+      var z = 0;
+
+      var x_omega = x;
+      var y_omega = y * Math.cos(theta) + z * Math.sin(theta);;
+      var z_omega = y * Math.sin(theta) + z * Math.cos(theta);
+  pointsData.push(new Point(x_omega, y_omega, z_omega, "i"));
 
   var loader = new THREE.FontLoader();
   var font;

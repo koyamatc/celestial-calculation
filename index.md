@@ -13,7 +13,7 @@ layout: default
 
 <div class="row">
 	<div class="col-sm-4">
-		<h3><span class="label label-info">天球座標</span></h3>
+		<h3><span class="label label-info">1.天球座標</span></h3>
 		<ol class="post-list">
  			{% for post in site.categories.coordinates %}
    				<li><a href="{{ post.url }}">{{ post.postTitle }}</a></li>
@@ -21,7 +21,7 @@ layout: default
 		</ol>			
 	</div>
 	<div class="col-sm-4">
-		<h3><span class="label label-info">恒星位置のずれ</span></h3>
+		<h3><span class="label label-info">2.恒星位置のずれ</span></h3>
 		<ol class="post-list">
  			{% for post in site.categories.difference %}
    				<li><a href="{{ post.url }}">{{ post.postTitle }}</a></li>
@@ -29,7 +29,7 @@ layout: default
 		</ol>			
 	</div>
 	<div class="col-sm-4">
-		<h3><span class="label label-info">いろいろな時刻系</span></h3>
+		<h3><span class="label label-info">3.いろいろな時刻系</span></h3>
 		<ol class="post-list">
  			{% for post in site.categories.time %}
    				<li><a href="{{ post.url }}">{{ post.postTitle }}</a></li>
@@ -39,7 +39,7 @@ layout: default
 </div>	
 <div class="row">
 	<div class="col-sm-4">
-		<h3><span class="label label-info">2体問題</span></h3>
+		<h3><span class="label label-info">4.2体問題</span></h3>
 		<ol class="post-list">
  			{% for post in site.categories.2bodies %}
    				<li><a href="{{ post.url }}">{{ post.postTitle }}</a></li>
@@ -47,7 +47,7 @@ layout: default
 		</ol>			
 	</div>
 	<div class="col-sm-4">
-		<h3><span class="label label-info">地球上の観測点の位置</span></h3>
+		<h3><span class="label label-info">5.地球上の観測点の位置</span></h3>
 		<ol class="post-list">
  			{% for post in site.categories.location %}
    				<li><a href="{{ post.url }}">{{ post.postTitle }}</a></li>
@@ -55,7 +55,7 @@ layout: default
 		</ol>			
 	</div>
 	<div class="col-sm-4">
-		<h3><span class="label label-info">2体問題からの発展</span></h3>
+		<h3><span class="label label-info">6.2体問題からの発展</span></h3>
 		<ol class="post-list">
  			{% for post in site.categories.2bodiesplus %}
    				<li><a href="{{ post.url }}">{{ post.postTitle }}</a></li>
