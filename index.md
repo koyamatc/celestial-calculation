@@ -57,7 +57,7 @@ layout: default
 	<div class="col-sm-4">
 		<h3><span class="label label-info">6.2体問題からの発展</span></h3>
 		<ol class="post-list">
- 			{% for post in site.categories.2bodiesplus %}
+ 			{% for post in site.categories.2bodies2 %}
    				<li><a href="{{ post.url }}">{{ post.postTitle }}</a></li>
  			{% endfor %}
 		</ol>			
