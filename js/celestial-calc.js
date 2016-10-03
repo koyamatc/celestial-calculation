@@ -493,19 +493,19 @@ function getE(E, M, e){
 
    var deltaM = M - (E - e * Math.sin(E));
    var deltaE = deltaM / ( 1 - e*Math.cos(E));
-   E = E + deltaE;
+   var E = E + deltaE;
 
     if (deltaE > 0.0000001) {
-        console.log(deltaE);
+        console.log("rec" + deltaE);
         
-        getE(E, M, e);
+        E = getE(E, M, e);
+        return E;
     }
     
     // Base case
     if ( deltaE <= 0.0000001){
         console.log(deltaE);
-        
-        /* 最終ステップ。ここから"countUp" を
-         呼ばないことで繰り返しをやめます。*/
+
+        return E;
     }	
 }
