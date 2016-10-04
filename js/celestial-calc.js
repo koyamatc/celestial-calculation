@@ -496,7 +496,7 @@ function getE(E, M, e){
    var E = E + deltaE;
 
     if (deltaE > 0.0000001) {
-        console.log("rec" + deltaE);
+  //      console.log("rec" + deltaE);
         
         E = getE(E, M, e);
         return E;
@@ -504,7 +504,7 @@ function getE(E, M, e){
     
     // Base case
     if ( deltaE <= 0.0000001){
-        console.log(deltaE);
+//        console.log(deltaE);
 
         return E;
     }	
