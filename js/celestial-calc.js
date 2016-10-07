@@ -4,11 +4,13 @@
    --------------------
 
 1. ユリウス日取得
-	 getJED(date)
+	 getJED(datetime, difference)
+	 
+	 datetime 	: 日時
+	 difference : 世界時との時差（日本　-9) 世界時 = 日本時 - 9
 
+	 return			: Julius Ephemeris Date, T 
 */
-
-
 
 var DegreePerHour = 15;
 var DegMinutePerMinute = 15;
@@ -21,22 +23,22 @@ var msecPerHour = msecPerMinute * 60;
 var msecPerDay = msecPerHour * 24;
 var RadiansPerDegree = Math.PI / 180;
 var JulianDate2000 = 2451545.0;
-var Julian2000 = new Date(2000,1,0,12,0,0);
+var Julian2000 = new Date(2000,1,1,12,0,0);
 var msecJulian2000 = Julian2000.getTime(); 
 /*
 		ユリウス通日取得J2000.0　Julian Ephemeric Date
 		
-		dateTime : 日時
+		dateTime 	 : 日時
 		difference : 世界時との時差(時)
 
 		return : Julian Ephemeris Date J2000.0
+						 T 元期からの経過
 
 */
 function getJED(dateTime, difference) {
 
 	//日時をミリ秒に変換し世界時にする
-	msecDateTime = dateTime.getTime() - difference * msecPerHour;
-
+	msecDateTime = dateTime.getTime() + difference * msecPerHour;
 	//ユリウス日J2000.0からの経過日数を計算
 	var msecPeriod = msecDateTime - msecJulian2000; 
 	var T_eph = msecPeriod / msecPerDay;
@@ -489,23 +491,19 @@ function horisonToCeles(l, m, n, theta, phi){
 		Solution of Kepler's Equation M = E - e * cosE 
 */
 function getE(E, M, e){
-   // Recursive case
 
    var deltaM = M - (E - e * Math.sin(E));
    var deltaE = deltaM / ( 1 - e*Math.cos(E));
    var E = E + deltaE;
 
+   // Recursive case
     if (deltaE > 0.0000001) {
-  //      console.log("rec" + deltaE);
-        
         E = getE(E, M, e);
         return E;
     }
     
     // Base case
     if ( deltaE <= 0.0000001){
-//        console.log(deltaE);
-
         return E;
     }	
 }
