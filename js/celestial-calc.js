@@ -495,15 +495,15 @@ function getE(E, M, e){
    var deltaM = M - (E - e * Math.sin(E));
    var deltaE = deltaM / ( 1 - e*Math.cos(E));
    var E = E + deltaE;
-
    // Recursive case
-    if (deltaE > 0.0000001) {
+    if (Math.abs(deltaE) > 0.0000001) {
         E = getE(E, M, e);
         return E;
     }
     
     // Base case
-    if ( deltaE <= 0.0000001){
+    if ( Math.abs(deltaE) <= 0.0000001){
+    	//console.log(deltaE);
         return E;
     }	
 }
