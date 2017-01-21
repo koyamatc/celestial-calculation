@@ -23,7 +23,7 @@ var msecPerHour = msecPerMinute * 60;
 var msecPerDay = msecPerHour * 24;
 var RadiansPerDegree = Math.PI / 180;
 var JulianDate2000 = 2451545.0;
-var Julian2000 = new Date(2000,1,1,12,0,0);
+var Julian2000 = new Date(2000,0,1,12,0,0);
 var msecJulian2000 = Julian2000.getTime(); 
 /*
 		ユリウス通日取得J2000.0　Julian Ephemeric Date
@@ -42,7 +42,7 @@ function getJED(dateTime, difference) {
 	//ユリウス日J2000.0からの経過日数を計算
 	var msecPeriod = msecDateTime - msecJulian2000; 
 	var T_eph = msecPeriod / msecPerDay;
-	var jed = JulianDate2000 + T_eph; 
+	var jed = JulianDate2000 +	 T_eph; 
 	var T = T_eph / 36525;
 
 	return {"JED":jed,"T":T};
@@ -211,7 +211,7 @@ function getSiderealTime(
 		// 恒星時
 		var theta = theta0 + lambda + t + correction;
 
-		console.log("sidereal time");
+		//console.log("sidereal time");
 		var _theta = displayTime(theta);
 
 		var h = _theta.hours,
@@ -243,7 +243,7 @@ function getMeanSiderealTime(datetime){
 	// 経過日数を計算
 	var interval = datetime.getTime() - baseDate.getTime();
 	var days = Math.floor(interval / msecPerDay ) + 0.5;
-	console.log("days= " + days);
+	//console.log("days= " + days);
 	var Tu = days / 36525;
 	var Tu2 = Tu*Tu;
 
@@ -253,10 +253,10 @@ function getMeanSiderealTime(datetime){
 	//displayTime(a);
 	var b = Tu * 8640184.542 *1000;
 	//console.log("b= " + b);
-	displayTime(b);
+	//displayTime(b);
 	var c = Tu2 * 0.0929 *1000;
 	//console.log("c= " + c);
-	displayTime(c);
+	//displayTime(c);
 	var theta0 = a + b + c;
 
 	//console.log("meanSidereal");
@@ -302,7 +302,7 @@ function displayTime(time){
 		var seconds = Math.floor(interval / 1000 );
 		interval = interval - (seconds * 1000); 
 
-		console.log(days + "日" + hours + "h" + minutes + "m" + seconds + "s" + interval);
+		//console.log(days + "日" + hours + "h" + minutes + "m" + seconds + "s" + interval);
 
 		return {
 			hours : hours,
